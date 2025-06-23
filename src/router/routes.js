@@ -2,7 +2,10 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    children: [
+      { path: '', component: () => import('pages/IndexPage.vue') },
+      { path: 'dashboard', component: () => import('pages/DashboardPage.vue'), meta: { requiresAuth: true } },
+    ],
   },
   {
     path: '/login',
@@ -11,11 +14,6 @@ const routes = [
   {
     path: '/register',
     component: () => import('src/components/auth/RegisterForm.vue'),
-  },
-  {
-    path: '/dashboard',
-    component: () => import('pages/DashboardPage.vue'),
-    meta: { requiresAuth: true },
   },
   {
     path: '/:catchAll(.*)*',
