@@ -68,10 +68,13 @@ const iniciarSesion = async () => {
 
   try {
     const response = await api.post('/api/usuarios/signin', user)
+
+    // ✅ Guardamos el objeto completo (incluye nombre, rol, token, etc.)
     localStorage.setItem('token', response.data.token)
     localStorage.setItem('user', JSON.stringify(response.data))
+
     $q.notify({ type: 'positive', message: 'Inicio de sesión exitoso.' })
-    router.push('/dashboard') // <--- CAMBIAR a /dashboard cuando funcione el dashboardPageeeeee
+    router.push('/dashboard')
   } catch (error) {
     if (error.response?.status === 401) {
       $q.notify({ type: 'negative', message: 'Correo o contraseña incorrectos.' })

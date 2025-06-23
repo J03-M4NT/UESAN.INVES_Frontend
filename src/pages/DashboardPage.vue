@@ -1,10 +1,16 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="text-h5 q-mb-md">Bienvenido, {{ user.Nombre }} {{ user.Apellido }}</div>
-    <div class="text-subtitle1">Rol: {{ user.NombreRol }}</div>
+    <div class="text-h5 q-mb-md">
+      Bienvenido, {{ user.Nombre || 'Usuario' }} {{ user.Apellido || '' }}
+    </div>
+
+    <div class="text-subtitle1">
+      Rol: {{ user.NombreRol || 'No asignado' }}
+    </div>
 
     <q-separator class="q-my-md" />
 
+    <!-- Panel para lector -->
     <div v-if="user.RolId === 1">
       <q-card class="q-mb-md">
         <q-card-section>
@@ -18,6 +24,7 @@
       </q-card>
     </div>
 
+    <!-- Panel para administrador -->
     <div v-else-if="user.RolId === 4">
       <q-card class="q-mb-md">
         <q-card-section>
