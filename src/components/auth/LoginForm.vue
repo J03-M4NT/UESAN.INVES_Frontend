@@ -74,7 +74,7 @@ const iniciarSesion = async () => {
     localStorage.setItem('user', JSON.stringify(response.data))
 
     $q.notify({ type: 'positive', message: 'Inicio de sesión exitoso.' })
-    router.push('/dashboard')
+    router.push('/') // Redirigir a la página principal después del login
   } catch (error) {
     if (error.response?.status === 401) {
       $q.notify({ type: 'negative', message: 'Correo o contraseña incorrectos.' })
