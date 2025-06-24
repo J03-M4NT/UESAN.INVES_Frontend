@@ -4,13 +4,17 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: 'dashboard', component: () => import('pages/DashboardPage.vue'), meta: { requiresAuth: true } },
+      // Rutas de la aplicación principal
     ],
   },
+
+  // Otras Rutas:
+
   {
     path: '/login',
     component: () => import('src/components/auth/LoginForm.vue'),
   },
+
   {
     path: '/register',
     component: () => import('src/components/auth/RegisterForm.vue'),
