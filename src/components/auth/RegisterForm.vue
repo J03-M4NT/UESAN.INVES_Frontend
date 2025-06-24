@@ -1,7 +1,7 @@
 <template>
   <div class="register-bg">
     <div class="register-card">
-      <div class="text-h5 text-center q-mb-md register-title">Registro de Usuario</div>
+      <div class="text-h5 text-center q-mb-md register-title">Registro de Usuario:</div>
       <q-form @submit.prevent="registrarUsuario" @reset="onReset" class="q-gutter-md">
         <q-input
           filled
@@ -34,20 +34,119 @@
           label="Dirección *"
           :rules="[(val) => !!val || 'Campo requerido']"
         />
+
+        <!-- Contraseña -->
         <q-input
           filled
           v-model="form.Password"
           label="Contraseña *"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
           :rules="[(val) => !!val || 'Campo requerido']"
-        />
+        >
+          <template #append>
+            <button
+              type="button"
+              class="toggle-password-btn"
+              @click="showPassword = !showPassword"
+              :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              tabindex="-1"
+            >
+              <span v-if="showPassword">
+                <!-- Ojo abierto SVG -->
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#bdbdbd"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </span>
+              <span v-else>
+                <!-- Ojo cerrado SVG -->
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#bdbdbd"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-6.06"
+                  />
+                  <path d="M1 1l22 22" />
+                  <path d="M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-5.47" />
+                  <path d="M14.47 14.47A3 3 0 0 1 12 9a3 3 0 0 1-2.47 5.47" />
+                </svg>
+              </span>
+            </button>
+          </template>
+        </q-input>
+
+        <!-- Repetir Contraseña -->
         <q-input
           filled
           v-model="repeatPassword"
           label="Repetir Contraseña *"
-          type="password"
+          :type="showRepeatPassword ? 'text' : 'password'"
           :rules="[(val) => val === form.Password || 'Las contraseñas no coinciden']"
-        />
+        >
+          <template #append>
+            <button
+              type="button"
+              class="toggle-password-btn"
+              @click="showRepeatPassword = !showRepeatPassword"
+              :aria-label="showRepeatPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              tabindex="-1"
+            >
+              <span v-if="showRepeatPassword">
+                <!-- Ojo abierto SVG -->
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#bdbdbd"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </span>
+              <span v-else>
+                <!-- Ojo cerrado SVG -->
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#bdbdbd"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-6.06"
+                  />
+                  <path d="M1 1l22 22" />
+                  <path d="M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-5.47" />
+                  <path d="M14.47 14.47A3 3 0 0 1 12 9a3 3 0 0 1-2.47 5.47" />
+                </svg>
+              </span>
+            </button>
+          </template>
+        </q-input>
+
         <div class="row items-center q-gutter-sm">
           <q-btn label="Registrarse" type="submit" color="primary" />
           <q-btn label="Cancelar" type="reset" color="primary" flat />
@@ -71,7 +170,9 @@ export default {
         Password: '',
         Type: 'U',
       },
+      showPassword: false,
       repeatPassword: '',
+      showRepeatPassword: false,
     }
   },
   methods: {
@@ -128,7 +229,8 @@ export default {
   padding: 2.5rem 2rem 2rem 2rem;
   margin: 2rem 0;
   min-width: 350px;
-  max-width: 500px;
+  max-width: 500px; /* Aumenta el ancho aquí */
+  width: 100%; /* Asegura que use todo el espacio disponible */
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
   display: flex;
   flex-direction: column;
@@ -180,4 +282,21 @@ export default {
 .q-btn:hover {
   background: #b71c1c;
 }
+
+/* Ocultar/Mostrar Contraseña */
+.toggle-password-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: #bdbdbd;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.toggle-password-btn:focus {
+  outline: none;
+}
+/* -------------------------- */
 </style>

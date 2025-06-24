@@ -1,9 +1,12 @@
 <template>
   <div class="login-container">
     <div class="login-card">
+      <div class="login-logo">
+        <img :src="logoVdi" alt="Logo" class="logo-img" />
+      </div>
       <div class="login-title">
         <span class="accent-bar"></span>
-        <h2>Bienvenido</h2>
+        <h2>Bienvenido!</h2>
       </div>
       <form class="login-form" @submit.prevent="login">
         <label class="login-label">Ingresa tus datos:</label>
@@ -16,14 +19,58 @@
             required
           />
         </div>
-        <div class="q-mb-md">
+        <div class="q-mb-md password-wrapper">
           <input
             v-model="password"
-            type="password"
+            :type="showPassword ? 'text' : 'password'"
             placeholder="Contraseña"
             class="login-input-native"
             required
           />
+          <button
+            type="button"
+            class="toggle-password-btn"
+            @click="showPassword = !showPassword"
+            :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            tabindex="-1"
+          >
+            <span v-if="showPassword">
+              <!-- Ojo abierto SVG -->
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#bdbdbd"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </span>
+            <span v-else>
+              <!-- Ojo cerrado SVG -->
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#bdbdbd"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-6.06"
+                />
+                <path d="M1 1l22 22" />
+                <path d="M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-5.47" />
+                <path d="M14.47 14.47A3 3 0 0 1 12 9a3 3 0 0 1-2.47 5.47" />
+              </svg>
+            </span>
+          </button>
         </div>
         <div class="forgot-password">
           <a href="#">¿Has olvidado tu contraseña?</a>
@@ -40,9 +87,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import logoVdi from 'src/assets/Logo_VDI-02.webp'
 
 const codigo = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const router = useRouter()
 
 function login() {
@@ -62,28 +111,35 @@ function goToRegister() {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  /* Fondo mitad gris, mitad imagen */
-  background:
-    linear-gradient(to right, #b2b2b2 50%, transparent 50%), url('../../assets/gente_img.png');
-  background-size:
-    60% 100%,
-    cover;
-  background-position: left, right;
-  background-repeat: no-repeat, no-repeat;
+  justify-content: center;
+  /* Fondo degradado personalizable de 3 colores */
+  background: linear-gradient(135deg, #740200 0%, #7c3c3c 50%, #c54343 100%);
 }
 .login-card {
   background: linear-gradient(to bottom, #23232b, transparent 100%);
   color: #fff;
   border-radius: 32px;
   padding: 2.5rem 2rem 2rem 2rem;
-  margin: 3rem 0 3rem 3rem;
+  margin: 3rem 0;
   min-width: 350px;
   max-width: 370px;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
   display: flex;
   flex-direction: column;
 }
+
+/* Logo VDI */
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.logo-img {
+  max-width: 330px;
+  height: auto;
+}
+/* ------------------------------------- */
+
 .login-title {
   display: flex;
   align-items: center;
@@ -157,4 +213,28 @@ function goToRegister() {
   text-decoration: underline;
   font-size: 0.98rem;
 }
+
+/* Mostrar/Ocultar Contraseña */
+.q-mb-md.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.toggle-password-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: #bdbdbd;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.toggle-password-btn:focus {
+  outline: none;
+}
+/*  */
 </style>
