@@ -342,3 +342,5 @@ function goToRegister() {
   }
 }
 </style>
+
+<!-- TODO: Revisar tema de conexion al backend para la base de datos con las cuentas -->
