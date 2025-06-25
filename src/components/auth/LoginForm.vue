@@ -16,7 +16,7 @@
             <input
               v-model="codigo"
               type="text"
-              placeholder="Código Institucional"
+              placeholder="Correo Electrónico"
               class="login-input-native"
               required
             />
@@ -115,13 +115,13 @@ const showPassword = ref(false)
 const onSubmit = async () => {
   loading.value = true
   try {
-    const response = await api.post('/api/auth/login', {
-      CodigoInstitucional: codigo.value,
-      Password: password.value,
+    const response = await api.post('/api/usuarios/signin', {
+      correo: codigo.value,
+      contraseña: password.value,
     })
 
     // Guardar datos del usuario y token
-    localStorage.setItem('user', JSON.stringify(response.data.user))
+    localStorage.setItem('user', JSON.stringify(response.data))
     localStorage.setItem('token', response.data.token)
 
     // Mostrar mensaje de éxito
@@ -131,11 +131,10 @@ const onSubmit = async () => {
     })
 
     // Redireccionar según el rol
-    const user = response.data.user
-    if (user.RolId === 4) {
+    if (response.data.rolId === 4) {
       router.push('/admin/dashboard')
     } else {
-      router.push('/dashboard')
+      router.push('/')
     }
   } catch (error) {
     $q.notify({
@@ -171,7 +170,8 @@ function goToRegister() {
   border-radius: 0 64px 64px 0;
   padding: 2.5rem 2rem 2rem 2rem;
   margin: 3rem 0;
-
+  min-width: 500px;
+  max-width: 700px; /* tamaño container del login */
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
   display: flex;
   flex-direction: column;
@@ -183,7 +183,7 @@ function goToRegister() {
   margin-bottom: 1rem;
 }
 .logo-img {
-  max-width: 750px;
+  max-width: 650px; /* Logo tamaño */
   height: auto;
   filter: brightness(0) saturate(100%) invert(15%) sepia(95%) saturate(6932%) hue-rotate(359deg)
     brightness(94%) contrast(112%);
@@ -342,3 +342,5 @@ function goToRegister() {
   }
 }
 </style>
+
+<!-- TODO: Revisar tema de conexion al backend para la base de datos con las cuentas -->
