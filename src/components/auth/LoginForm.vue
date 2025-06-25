@@ -16,7 +16,7 @@
             <input
               v-model="codigo"
               type="text"
-              placeholder="Código Institucional"
+              placeholder="Correo Electrónico"
               class="login-input-native"
               required
             />
@@ -115,13 +115,13 @@ const showPassword = ref(false)
 const onSubmit = async () => {
   loading.value = true
   try {
-    const response = await api.post('/api/auth/login', {
-      CodigoInstitucional: codigo.value,
-      Password: password.value,
+    const response = await api.post('/api/usuarios/signin', {
+      correo: codigo.value,
+      contraseña: password.value,
     })
 
     // Guardar datos del usuario y token
-    localStorage.setItem('user', JSON.stringify(response.data.user))
+    localStorage.setItem('user', JSON.stringify(response.data))
     localStorage.setItem('token', response.data.token)
 
     // Mostrar mensaje de éxito
@@ -131,11 +131,10 @@ const onSubmit = async () => {
     })
 
     // Redireccionar según el rol
-    const user = response.data.user
-    if (user.RolId === 4) {
+    if (response.data.rolId === 4) {
       router.push('/admin/dashboard')
     } else {
-      router.push('/dashboard')
+      router.push('/')
     }
   } catch (error) {
     $q.notify({
