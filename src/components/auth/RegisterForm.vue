@@ -220,20 +220,24 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+  background:
+    linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(60, 60, 60, 0.7)),
+    url('https://www.esan.edu.pe/images/blog/20230512/jHG2JL.png') center center/cover no-repeat;
+  filter: grayscale(1);
 }
 .register-card {
-  background: #8f8f9a;
+  background: rgba(30, 30, 30, 0.65); /* fondo oscuro translúcido */
   color: #fff;
   border-radius: 32px;
   padding: 2.5rem 2rem 2rem 2rem;
   margin: 2rem 0;
   min-width: 350px;
-  max-width: 500px; /* Aumenta el ancho aquí */
-  width: 100%; /* Asegura que use todo el espacio disponible */
+  max-width: 500px;
+  width: 100%;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(6px); /* efecto glassmorphism */
 }
 .text-h5,
 .register-title {
@@ -242,6 +246,7 @@ export default {
   margin-bottom: 1.5rem;
   color: #fff;
   text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* mejor legibilidad */
 }
 .q-form {
   width: 100%;
@@ -252,35 +257,49 @@ export default {
 .q-input input,
 .q-input__control,
 .q-field__control {
-  background: #18181f !important;
-  color: #fff !important;
+  background: rgba(24, 24, 31, 0.85) !important;
   border-radius: 12px !important;
-  border: 1px solid #bdbdbd !important;
-  font-size: 1rem;
+  border: 1.5px solid #fff !important;
 }
-.q-input input:focus {
-  border: 1.5px solid #d32f2f !important;
+.q-input input {
+  color: #fff !important;
+  border: none !important;
 }
-.q-btn {
+.q-input__label,
+.q-field__label,
+.q-field__append,
+.q-field__prepend,
+.q-icon,
+.q-field__control .q-icon {
+  color: #fff !important;
+  fill: #fff !important;
+}
+.q-input input:focus,
+.q-field--focused .q-field__control {
+  border: 2px solid #fff !important;
+  box-shadow: 0 0 0 1.5px #fff !important;
+}
+.q-btn,
+.q-btn[type='reset'],
+.q-btn--flat,
+.q-btn--standard {
   width: 100%;
-  background: #d32f2f;
-  color: #fff;
+  background: #d32f2f !important;
+  color: #fff !important;
   font-weight: 600;
   border-radius: 20px;
   margin-bottom: 0.7rem;
   padding: 0.7rem 0;
-  border: none;
+  border: none !important;
   font-size: 1.1rem;
   cursor: pointer;
   transition: background 0.2s;
 }
-.q-btn[type='reset'] {
-  background: transparent;
-  color: #fff;
-  border: 1px solid #fff;
-}
-.q-btn:hover {
-  background: #b71c1c;
+.q-btn:hover,
+.q-btn[type='reset']:hover,
+.q-btn--flat:hover,
+.q-btn--standard:hover {
+  background: #b71c1c !important;
 }
 
 /* Ocultar/Mostrar Contraseña */
