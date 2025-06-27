@@ -7,7 +7,6 @@
       </div>
     </div>
 
-    <!-- Filtro por línea de investigación -->
     <q-select
       filled
       v-model="lineaSeleccionada"
@@ -18,7 +17,6 @@
       class="q-mb-xl"
     />
 
-    <!-- Lista de revistas -->
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-6 col-lg-4" v-for="revista in revistasFiltradas" :key="revista.id">
         <q-card>
@@ -27,8 +25,10 @@
               <div class="col">
                 <div class="text-subtitle1">{{ revista.titulo }}</div>
                 <div class="text-caption text-grey">
-                  Línea: {{ revista.linea }} <br />
-                  Índice: {{ revista.indice }}
+                  Línea: {{ revista.linea || 'N/A' }} <br />
+                  Incentivo: ${{ revista.incentivo || 0 }} <br />
+                  Fecha:
+                  {{ revista.fecha ? new Date(revista.fecha).toLocaleDateString() : 'N/A' }}
                 </div>
               </div>
               <q-btn
@@ -41,7 +41,7 @@
             </div>
           </q-card-section>
           <q-card-actions align="right">
-            <q-btn flat label="Ver más" :href="revista.enlace" target="_blank" />
+            <q-btn flat label="Ver más" />
           </q-card-actions>
         </q-card>
       </div>
@@ -50,47 +50,32 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { api } from 'boot/axios'
 
 const lineaSeleccionada = ref(null)
+const revistas = ref([])
+const lineas = ref([])
 
-const lineas = [
-  { label: 'Negocios Internacionales', value: 'negocios' },
-  { label: 'Finanzas', value: 'finanzas' },
-  { label: 'Marketing', value: 'marketing' },
-  { label: 'Innovación y Tecnología', value: 'tecnologia' },
-]
+onMounted(async () => {
+  try {
+    const res = await api.get('/api/publicaciones')
+    const data = res.data.$values || []
 
-const revistas = ref([
-  {
-    id: 1,
-    titulo: 'International Business Review',
-    linea: 'negocios',
-    indice: 'Scopus Q1',
-    enlace: 'https://www.journals.elsevier.com/international-business-review',
-  },
-  {
-    id: 2,
-    titulo: 'Journal of Corporate Finance',
-    linea: 'finanzas',
-    indice: 'Scopus Q1',
-    enlace: 'https://www.journals.elsevier.com/journal-of-corporate-finance',
-  },
-  {
-    id: 3,
-    titulo: 'Journal of Marketing',
-    linea: 'marketing',
-    indice: 'Scopus Q1',
-    enlace: 'https://journals.sagepub.com/home/jmx',
-  },
-  {
-    id: 4,
-    titulo: 'Research Policy',
-    linea: 'tecnologia',
-    indice: 'Scopus Q1',
-    enlace: 'https://www.journals.elsevier.com/research-policy',
-  },
-])
+    revistas.value = data.map((p) => ({
+      id: p.publicacionId,
+      titulo: p.nombre,
+      linea: p.categoria?.nombreCategoria || 'N/A',
+      incentivo: p.incentivoUsd || 0,
+      fecha: p.fechaPublicacion,
+    }))
+
+    const unicas = [...new Set(revistas.value.map((r) => r.linea))]
+    lineas.value = unicas.filter((l) => l && l !== 'N/A').map((l) => ({ label: l, value: l }))
+  } catch (err) {
+    console.error('Error cargando publicaciones:', err)
+  }
+})
 
 const revistasFiltradas = computed(() => {
   if (!lineaSeleccionada.value) return revistas.value
