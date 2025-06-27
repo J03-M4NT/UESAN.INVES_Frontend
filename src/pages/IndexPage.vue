@@ -1,80 +1,48 @@
 <template>
   <q-page padding>
-    <!-- TODO: Sandro TODO EL Q-PAGE (QUE ESTA ESCRITO ARRIBA XD) es lo que tenemos 
-         que hacer que se actualize para que se muestre los cambios, a la hora de 
-         cambiar a revistas, guardados, etc. sandro gay -->
-
-    <!-- TODO: AGREGAR VISTA PREVIA DE POST DE LAS CUENTAS DEL VDI 
-     
-    
-    -->
-
     <!-- Hero Section -->
-    <div class="q-pa-md bg-primary text-white text-center">
-      <h1 class="text-h4">Vicerrectorado de Investigación</h1>
-      <p>
-        Descubre todos los servicios que ofrecemos para potenciar tus habilidades investigativas.
-      </p>
-      <q-btn color="secondary" label="Ver servicios" @click="scrollTo('servicios')" />
+    <div class="hero-banner-img q-mb-lg">
+      <div class="hero-banner-content">
+        <h1 class="text-h4">Vicerrectorado de Investigación</h1>
+        <p>
+          Descubre todos los servicios que ofrecemos para potenciar tus habilidades investigativas.
+        </p>
+        <q-btn color="secondary" label="Ver servicios" @click="scrollTo('servicios')" />
+      </div>
     </div>
 
     <!-- Servicios -->
     <div class="q-mt-xl" id="servicios">
-      <h2 class="text-h5 q-mb-md">Servicios que ofrecemos</h2>
-      <q-list bordered class="q-mb-xl">
-        <q-item v-for="(servicio, index) in servicios" :key="index" clickable>
-          <q-item-section avatar>
-            <q-icon :name="servicio.icon" />
-          </q-item-section>
-          <q-item-section>
-            {{ servicio.nombre }}
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <h2 class="text-h5 q-mb-md text-center text-white text-shadow">Servicios</h2>
+      <div class="servicios-grid">
+        <div v-for="(servicio, index) in servicios" :key="index" class="servicio-card">
+          <q-icon :name="servicio.icon" size="48px" class="servicio-icon" />
+          <div class="servicio-nombre">{{ servicio.nombre }}</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Revistas Recientes -->
+    <!-- Revistas Recurrentes -->
     <div class="q-mt-xl" id="revistas">
-      <h2 class="text-h5 q-mb-md">Revistas leídas recientemente</h2>
-      <q-card v-for="(revista, index) in revistas" :key="index" class="q-mb-md">
+      <h2 class="text-h5 q-mb-md">Revistas recurrentes</h2>
+      <q-card v-for="(revista, index) in revistasRecurrentes" :key="index" class="q-mb-md">
         <q-card-section>
-          <div class="text-subtitle1">{{ revista.titulo }}</div>
-          <div class="text-caption text-grey">{{ revista.fecha }}</div>
+          <div class="text-subtitle1">{{ revista.nombre }}</div>
+          <div class="text-caption text-grey">Leída {{ revista.vecesLeida }} veces</div>
         </q-card-section>
       </q-card>
     </div>
 
-    <!-- Revistas Destacadas -->
-    <!-- Dejar comentado para no usar xddddd
-
-    <div class="q-mt-xl" id="revistas">
-      <h2 class="text-h5 q-mb-md">Revistas</h2>
-      <q-list bordered>
-        <q-item v-for="revista in revistasDestacadas" :key="revista.id" clickable>
-          <q-item-section avatar>
-            <q-icon name="menu_book" />
-          </q-item-section>
-          <q-item-section>
-            <div class="text-subtitle1">{{ revista.nombre }}</div>
-            <div class="text-caption">{{ revista.descripcion }}</div>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </div>
-    -->
-
     <!-- Call to Action -->
     <div class="q-mt-xl text-center">
-      <h3 class="text-h6">¿Quieres formar parte de nuestros proyectos?</h3>
-      <q-btn color="primary" label="Postula a una convocatoria" />
+      <h3 class="text-h6">¿Quieres generar una publicación?</h3>
+      <q-btn color="primary" label="Ingresa aquí" />
     </div>
   </q-page>
 </template>
 
-<!--Hola xd -->
-
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { scroll } from 'quasar'
 
 const { setVerticalScrollPosition } = scroll
@@ -87,37 +55,83 @@ const servicios = ref([
   { nombre: 'Talleres y capacitaciones', icon: 'event' },
 ])
 
+// Simulación de revistas con contador de lecturas
 const revistas = ref([
-  { titulo: 'Revista Científica UXYZ – Vol. 12, No. 3', fecha: 'Mayo 2025' },
-  { titulo: 'Avances en Investigación', fecha: 'Abril 2025' },
-  { titulo: 'Innovación Académica', fecha: 'Marzo 2025' },
+  { nombre: 'Revista Científica UXYZ – Vol. 12, No. 3', vecesLeida: 12 },
+  { nombre: 'Avances en Investigación', vecesLeida: 8 },
+  { nombre: 'Innovación Académica', vecesLeida: 5 },
+  { nombre: 'Ciencia y Sociedad', vecesLeida: 3 },
+  { nombre: 'Gestión Empresarial', vecesLeida: 2 },
 ])
 
-/* 
-DEJAR COMENTADO PARA NO USAR xddddd
-
-const revistasDestacadas = ref([
-  {
-    id: 1,
-    nombre: 'Revista ESAN',
-    descripcion: 'Publicaciones de investigación de la universidad.',
-  },
-  {
-    id: 2,
-    nombre: 'Ciencia y Sociedad',
-    descripcion: 'Revista multidisciplinaria de ciencia y sociedad.',
-  },
-  {
-    id: 3,
-    nombre: 'Innovación y Empresa',
-    descripcion: 'Tendencias y estudios sobre innovación empresarial.',
-  },
-])
-*/
+// Las 3 revistas más leídas
+const revistasRecurrentes = computed(() =>
+  [...revistas.value].sort((a, b) => b.vecesLeida - a.vecesLeida).slice(0, 3),
+)
 
 const scrollTo = (id) => {
   const el = document.getElementById(id)
   if (el) setVerticalScrollPosition(window, el.offsetTop, 500)
 }
-// Function to scroll to a specific section
 </script>
+
+<style scoped>
+.hero-banner-img {
+  background: url('https://th.bing.com/th/id/R.0612d98df402be48ef0bd38388fad856?rik=gbtdYNb6Tjj7pw&pid=ImgRaw&r=0')
+    center center/cover no-repeat;
+  border-radius: 20px;
+  color: #fff;
+  text-align: center;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hero-banner-content {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 16px;
+  padding: 2.5rem 1rem 1.5rem 1rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.servicios-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.servicio-card {
+  background: #e51a3b;
+  color: #fff;
+  border-radius: 18px;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
+  transition: transform 0.2s;
+}
+.servicio-card:hover {
+  transform: translateY(-6px) scale(1.05);
+}
+.servicio-icon {
+  margin-bottom: 0.5rem;
+}
+.servicio-nombre {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 0.2rem;
+  line-height: 1.2;
+}
+.text-shadow {
+  text-shadow: 1px 1px 4px #444;
+}
+</style>
