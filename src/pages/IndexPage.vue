@@ -1,5 +1,14 @@
 <template>
   <q-page padding>
+    <!-- TODO: Sandro TODO EL Q-PAGE (QUE ESTA ESCRITO ARRIBA XD) es lo que tenemos 
+         que hacer que se actualize para que se muestre los cambios, a la hora de 
+         cambiar a revistas, guardados, etc. sandro gay -->
+
+    <!-- TODO: AGREGAR VISTA PREVIA DE POST DE LAS CUENTAS DEL VDI 
+     
+    
+    -->
+
     <!-- Hero Section -->
     <div class="q-pa-md bg-primary text-white text-center">
       <h1 class="text-h4">Vicerrectorado de Investigación</h1>
@@ -36,7 +45,8 @@
     </div>
 
     <!-- Revistas Destacadas -->
-    <!-- TODO: ELIMINAR-->
+    <!-- Dejar comentado para no usar xddddd
+
     <div class="q-mt-xl" id="revistas">
       <h2 class="text-h5 q-mb-md">Revistas</h2>
       <q-list bordered>
@@ -51,6 +61,7 @@
         </q-item>
       </q-list>
     </div>
+    -->
 
     <!-- Call to Action -->
     <div class="q-mt-xl text-center">
@@ -82,6 +93,9 @@ const revistas = ref([
   { titulo: 'Innovación Académica', fecha: 'Marzo 2025' },
 ])
 
+/* 
+DEJAR COMENTADO PARA NO USAR xddddd
+
 const revistasDestacadas = ref([
   {
     id: 1,
@@ -99,6 +113,7 @@ const revistasDestacadas = ref([
     descripcion: 'Tendencias y estudios sobre innovación empresarial.',
   },
 ])
+*/
 
 const scrollTo = (id) => {
   const el = document.getElementById(id)

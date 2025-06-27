@@ -4,7 +4,10 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: 'revistas', component: () => import('pages/RevistasPage.vue') },
+      { path: '/revistas', component: () => import('pages/RevistasPage.vue') },
+      { path: '/articulos', component: () => import('pages/ArticulosPage.vue') },
+      { path: '/noticias', component: () => import('pages/NoticiasPage.vue') },
+      { path: '/guardados', component: () => import('pages/GuardadosPage.vue') },
       // Rutas de la aplicación principal
     ],
   },
