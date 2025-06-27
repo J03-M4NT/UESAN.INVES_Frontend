@@ -4,6 +4,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
+      { path: 'revistas', component: () => import('pages/RevistasPage.vue') },
       // Rutas de la aplicación principal
     ],
   },
