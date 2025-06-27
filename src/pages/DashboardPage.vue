@@ -4,9 +4,7 @@
       Bienvenido, {{ user.Nombre || 'Usuario' }} {{ user.Apellido || '' }}
     </div>
 
-    <div class="text-subtitle1">
-      Rol: {{ user.NombreRol || 'No asignado' }}
-    </div>
+    <div class="text-subtitle1">Rol: {{ user.NombreRol || 'No asignado' }}</div>
 
     <q-separator class="q-my-md" />
 
@@ -57,4 +55,5 @@ onMounted(async () => {
     }
   }
 })
+// Puedes agregar más lógica aquí según el rol del usuario
 </script>

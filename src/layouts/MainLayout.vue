@@ -70,4 +70,5 @@ function toggleLeftDrawer() {
 .q-item__section {
   color: #e25050 !important;
 }
+/* Estilo para el enlace activo */
 </style>

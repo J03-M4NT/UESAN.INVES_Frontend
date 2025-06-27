@@ -47,4 +47,5 @@ const revistas = ref([
 .bg-primary {
   background: #d32f2f !important;
 }
+/* Estilo para el título de la página */
 </style>

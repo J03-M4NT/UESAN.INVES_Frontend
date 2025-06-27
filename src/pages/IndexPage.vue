@@ -101,4 +101,5 @@ const scrollTo = (id) => {
   const el = document.getElementById(id)
   if (el) setVerticalScrollPosition(window, el.offsetTop, 500)
 }
+// Function to scroll to a specific section
 </script>

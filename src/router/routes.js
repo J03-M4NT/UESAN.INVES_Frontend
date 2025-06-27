@@ -25,5 +25,5 @@ const routes = [
     component: () => import('pages/ErrorNotFound.vue'),
   },
 ]
-
+// Las rutas de arriba son las rutas principales de la aplicación,
 export default routes
