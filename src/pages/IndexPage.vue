@@ -60,6 +60,8 @@
   </q-page>
 </template>
 
+<!--Hola xd -->
+
 <script setup>
 import { ref } from 'vue'
 import { scroll } from 'quasar'
