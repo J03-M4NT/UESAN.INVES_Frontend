@@ -86,7 +86,7 @@
     </div>
     <!-- Panel derecho - Bienvenida con imagen -->
     <div class="welcome-panel">
-      <div class="text-white text-center q-pa-md absolute-center">
+      <div class="text-white text-center q-pa-md absolute-center welcome-title">
         <div class="text-h3 q-mb-md">Investigación ESAN</div>
         <div class="text-h5">La curiosidad es la chispa que enciende el conocimiento.</div>
         <div class="text-subtitle1 q-mt-md">
@@ -152,6 +152,7 @@ function goToRegister() {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
 .login-main-row {
   display: flex;
   min-height: 100vh;
@@ -300,13 +301,13 @@ function goToRegister() {
   justify-content: center;
 }
 .welcome-panel::before {
-  content: '';
+  content: ''; /* Panel derecho colores con img.png */
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%);
   z-index: 1;
 }
 .absolute-center {
@@ -320,6 +321,9 @@ function goToRegister() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.welcome-title {
+  font-family: 'Montserrat', Arial, sans-serif !important;
 }
 @media (max-width: 900px) {
   .login-main-row {
