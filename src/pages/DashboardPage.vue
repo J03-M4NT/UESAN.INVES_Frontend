@@ -56,4 +56,5 @@ onMounted(async () => {
     }
   }
 })
+// Puedes agregar más lógica aquí según el rol del usuario
 </script>

@@ -169,10 +169,10 @@ function goToRegister() {
   background: linear-gradient(to bottom, #23232b, transparent 100%);
   color: #fff;
   border-radius: 0 64px 64px 0;
-  padding: 2.5rem 2rem 2rem 2rem;
-  margin: 3rem 0;
-  min-width: 500px;
-  max-width: 700px; /* tamaño container del login */
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem; /* menos padding */
+  margin: 2rem 0; /* menos margen */
+  min-width: 340px; /* más pequeño */
+  max-width: 400px; /* más pequeño */
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
   display: flex;
   flex-direction: column;
@@ -184,10 +184,9 @@ function goToRegister() {
   margin-bottom: 1rem;
 }
 .logo-img {
-  max-width: 650px; /* Logo tamaño */
+  max-width: 350px; /* más pequeño para que encaje mejor */
   height: auto;
-  filter: brightness(0) saturate(100%) invert(15%) sepia(95%) saturate(6932%) hue-rotate(359deg)
-    brightness(94%) contrast(112%);
+  filter: none; /* quitar filtro para que el rojo sea más vivo */
 }
 .login-title {
   display: flex;
@@ -289,7 +288,7 @@ function goToRegister() {
 }
 .welcome-panel {
   position: relative;
-  background-image: url('src/assets/img.png'); /* Cambiar por la imagen real */
+  background-image: url('src/assets/img.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -339,10 +338,10 @@ function goToRegister() {
     min-width: 90vw;
     max-width: 98vw;
     border-radius: 0 32px 32px 0;
-    padding: 1.5rem 0.5rem 1rem 0.5rem;
+    padding: 1.2rem 0.5rem 1rem 0.5rem; /* menos padding en mobile */
   }
   .logo-img {
-    max-width: 140px;
+    max-width: 120px;
   }
 }
 </style>
