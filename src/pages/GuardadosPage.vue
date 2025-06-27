@@ -2,19 +2,21 @@
   <q-page padding>
     <h1 class="text-h5 q-mb-md">Mis elementos guardados</h1>
 
-    <div v-if="revistas.length === 0">
-      <p>No has guardado ninguna revista aún.</p>
-    </div>
+    <div v-if="guardadosFiltrados.length === 0">No has guardado ninguna revista aún.</div>
 
-    <div class="row q-col-gutter-md">
-      <div v-for="revista in revistas" :key="revista.id" class="col-12 col-md-6">
+    <div class="row q-col-gutter-md" v-else>
+      <div class="col-12 col-md-6 col-lg-4" v-for="g in guardadosFiltrados" :key="g.id">
         <q-card>
           <q-card-section>
-            <div class="text-subtitle1">{{ revista.titulo }}</div>
-            <div class="text-caption text-grey">{{ revista.indice }}</div>
+            <div class="text-subtitle1">{{ g.publicacion?.nombre || 'Sin título' }}</div>
+            <div class="text-caption text-grey">
+              Incentivo: ${{ g.publicacion?.incentivoUsd || 0 }} <br />
+              Fecha publicación: {{ formatFecha(g.publicacion?.fechaPublicacion) }} <br />
+              Guardado el: {{ formatFecha(g.fechaGuardado) }}
+            </div>
           </q-card-section>
           <q-card-actions align="right">
-            <q-btn label="Ver más" :to="`/revista/${revista.id}`" flat />
+            <q-btn flat label="Eliminar" color="red" @click="eliminarGuardado(g.id)" />
           </q-card-actions>
         </q-card>
       </div>
@@ -23,14 +25,38 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { obtenerRevistas } from 'src/services/RevistasService'
+import { ref, onMounted, computed } from 'vue'
+import { api } from 'boot/axios'
 
-const revistas = ref([])
+const guardados = ref([])
 
 onMounted(async () => {
-  const todas = await obtenerRevistas()
-  const guardadas = JSON.parse(localStorage.getItem('revistasGuardadas')) || []
-  revistas.value = todas.filter((r) => guardadas.includes(r.id))
+  try {
+    const res = await api.get('/api/publicacionesguardadas')
+    guardados.value = res.data['$values'] || []
+  } catch (err) {
+    console.error('Error cargando publicaciones guardadas:', err)
+  }
+})
+
+const eliminarGuardado = async (id) => {
+  try {
+    await api.delete(`/api/publicacionesguardadas/${id}`)
+    guardados.value = guardados.value.filter((g) => g.id !== id)
+  } catch (err) {
+    console.error('Error eliminando guardado:', err)
+  }
+}
+
+const formatFecha = (fecha) => {
+  if (!fecha) return 'N/A'
+  const d = new Date(fecha)
+  return isNaN(d) ? 'N/A' : d.toLocaleDateString()
+}
+
+const guardadosFiltrados = computed(() => {
+  return guardados.value.filter((g) => g.publicacion)
 })
 </script>
+
+<style scoped></style>
