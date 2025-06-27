@@ -131,11 +131,18 @@ const onSubmit = async () => {
     })
 
     // Redireccionar según el rol
+    // Siempre redirigir al indexpage
+    router.push('/')
+
+    /*
+    Asi funcionaba para los que eran admins solo:
+
     if (response.data.rolId === 4) {
       router.push('/admin/dashboard')
     } else {
       router.push('/')
     }
+    */
   } catch (error) {
     $q.notify({
       type: 'negative',

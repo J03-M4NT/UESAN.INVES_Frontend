@@ -36,6 +36,7 @@
     </div>
 
     <!-- Revistas Destacadas -->
+    <!-- TODO: ELIMINAR-->
     <div class="q-mt-xl" id="revistas">
       <h2 class="text-h5 q-mb-md">Revistas</h2>
       <q-list bordered>
