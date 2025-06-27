@@ -1,44 +1,35 @@
 <template>
-  <div class="register-bg">
+  <div
+    class="register-bg"
+    :style="{
+      background: `linear-gradient(135deg, rgba(40,40,60,0.55) 0%, rgba(60,60,80,0.55) 100%), url(${bgRegister}) center center/cover no-repeat`,
+    }"
+  >
     <div class="register-card">
-      <div class="text-h5 text-center q-mb-md register-title">Registro de Usuario:</div>
-      <q-form @submit.prevent="registrarUsuario" @reset="onReset" class="q-gutter-md">
+      <div class="text-h5 text-center q-mb-md register-title">Registra tu cuenta</div>
+      <q-form @submit.prevent="registrarUsuario" class="q-gutter-md">
         <q-input
           filled
-          v-model="form.FirstName"
+          v-model="form.Nombre"
           label="Nombre *"
           :rules="[(val) => !!val || 'Campo requerido']"
         />
         <q-input
           filled
-          v-model="form.LastName"
+          v-model="form.Apellido"
           label="Apellido *"
           :rules="[(val) => !!val || 'Campo requerido']"
         />
         <q-input
           filled
-          v-model="form.Email"
-          label="Email *"
+          v-model="form.Correo"
+          label="Correo *"
           type="email"
           :rules="[(val) => !!val || 'Campo requerido']"
         />
         <q-input
           filled
-          v-model="form.Country"
-          label="País *"
-          :rules="[(val) => !!val || 'Campo requerido']"
-        />
-        <q-input
-          filled
-          v-model="form.Address"
-          label="Dirección *"
-          :rules="[(val) => !!val || 'Campo requerido']"
-        />
-
-        <!-- Contraseña -->
-        <q-input
-          filled
-          v-model="form.Password"
+          v-model="form.Contraseña"
           label="Contraseña *"
           :type="showPassword ? 'text' : 'password'"
           :rules="[(val) => !!val || 'Campo requerido']"
@@ -90,14 +81,12 @@
             </button>
           </template>
         </q-input>
-
-        <!-- Repetir Contraseña -->
         <q-input
           filled
           v-model="repeatPassword"
           label="Repetir Contraseña *"
           :type="showRepeatPassword ? 'text' : 'password'"
-          :rules="[(val) => val === form.Password || 'Las contraseñas no coinciden']"
+          :rules="[(val) => val === form.Contraseña || 'Las contraseñas no coinciden']"
         >
           <template #append>
             <button
@@ -146,70 +135,75 @@
             </button>
           </template>
         </q-input>
-
+        <q-select
+          filled
+          v-model="form.RolId"
+          label="Rol *"
+          :options="roles"
+          option-label="label"
+          option-value="value"
+          emit-value
+          map-options
+          :rules="[(val) => !!val || 'Campo requerido']"
+        />
+        <q-toggle v-model="form.Estado" label="Activo" />
         <div class="row items-center q-gutter-sm">
           <q-btn label="Registrarse" type="submit" color="primary" />
-          <q-btn label="Cancelar" type="reset" color="primary" flat />
+          <q-btn label="Cancelar" type="reset" color="primary" flat @click="cancelarRegistro" />
         </div>
       </q-form>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'RegisterForm',
-  data() {
-    return {
-      form: {
-        FirstName: '',
-        LastName: '',
-        Email: '',
-        Country: '',
-        Address: '',
-        Password: '',
-        Type: 'U',
-      },
-      showPassword: false,
-      repeatPassword: '',
-      showRepeatPassword: false,
-    }
-  },
-  methods: {
-    registrarUsuario() {
-      if (this.form.Password !== this.repeatPassword) {
-        this.$q.notify({ type: 'negative', message: 'Las contraseñas no coinciden.' })
-        return
-      }
-      try {
-        this.$api
-          .post('api/users', this.form)
-          .then((response) => {
-            console.log('Usuario registrado:', response.data)
-            this.$router.push('/login')
-          })
-          .catch((error) => {
-            console.error('Error al registrar usuario:', error)
-            this.$q.notify({ type: 'negative', message: 'Error al registrar usuario.' })
-          })
-      } catch (e) {
-        console.error('Error al registrar usuario:', e)
-        this.$q.notify({ type: 'negative', message: 'Error al registrar usuario.' })
-      }
-    },
-    onReset() {
-      this.form = {
-        FirstName: '',
-        LastName: '',
-        Email: '',
-        Country: '',
-        Address: '',
-        Password: '',
-        Type: 'U',
-      }
-      this.repeatPassword = ''
-    },
-  },
+<script setup>
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+import { api } from 'boot/axios'
+import bgRegister from 'src/assets/esan_noche.jpg'
+
+const $q = useQuasar()
+const router = useRouter()
+
+const form = reactive({
+  Nombre: '',
+  Apellido: '',
+  Correo: '',
+  Contraseña: '',
+  RolId: null,
+  Estado: true,
+})
+
+const repeatPassword = ref('')
+const showPassword = ref(false)
+const showRepeatPassword = ref(false)
+
+const roles = [
+  { label: 'Estudiante', value: 1 },
+  { label: 'Profesor', value: 2 },
+  { label: 'Personal Externo', value: 3 },
+  { label: 'Administrador', value: 4 },
+]
+
+const registrarUsuario = async () => {
+  if (form.Contraseña !== repeatPassword.value) {
+    $q.notify({ type: 'negative', message: 'Las contraseñas no coinciden.' })
+    return
+  }
+
+  try {
+    await api.post('/api/usuarios', form)
+    $q.notify({ type: 'positive', message: 'Registro exitoso.' })
+    router.push('/login')
+  } catch (error) {
+    console.error(error)
+    $q.notify({ type: 'negative', message: 'Error al registrar.' })
+  }
+}
+
+const cancelarRegistro = () => {
+  router.push('/login')
 }
 </script>
 
@@ -220,13 +214,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(60, 60, 60, 0.7)),
-    url('https://www.esan.edu.pe/images/blog/20230512/jHG2JL.png') center center/cover no-repeat;
-  filter: grayscale(1);
+  /* El fondo se asigna dinámicamente desde el atributo :style */
 }
 .register-card {
-  background: rgba(30, 30, 30, 0.65); /* fondo oscuro translúcido */
+  background: rgba(60, 60, 80, 0.496); /* Más oscuro y translúcido */
   color: #fff;
   border-radius: 32px;
   padding: 2.5rem 2rem 2rem 2rem;
@@ -237,14 +228,17 @@ export default {
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(6px); /* efecto glassmorphism */
+  /* Efecto de desenfoque para mayor modernidad */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 255, 255, 0.18); /* Borde sutil */
 }
 .text-h5,
 .register-title {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: #fff;
+  color: #ffffff;
   text-align: center;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* mejor legibilidad */
 }
@@ -316,6 +310,13 @@ export default {
 }
 .toggle-password-btn:focus {
   outline: none;
+}
+/* -------------------------- */
+
+/* Color de las palabras que estan dentro de los cuadros de nombre, apellidos, etc */
+:deep(.q-field__label) {
+  color: #c3c3c3 !important;
+  opacity: 1 !important;
 }
 /* -------------------------- */
 </style>

@@ -20,12 +20,15 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <ChatBot />
   </q-layout>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
+import ChatBot from 'src/components/auth/ChatBot.vue'
 
 const linksList = computed(() => [
   { title: 'Inicio', caption: '', icon: 'home', link: '/' },
