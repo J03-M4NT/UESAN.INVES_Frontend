@@ -149,7 +149,7 @@
         <q-toggle v-model="form.Estado" label="Activo" />
         <div class="row items-center q-gutter-sm">
           <q-btn label="Registrarse" type="submit" color="primary" />
-          <q-btn label="Cancelar" type="reset" color="primary" flat />
+          <q-btn label="Cancelar" type="reset" color="primary" flat @click="cancelarRegistro" />
         </div>
       </q-form>
     </div>
@@ -200,6 +200,10 @@ const registrarUsuario = async () => {
     console.error(error)
     $q.notify({ type: 'negative', message: 'Error al registrar.' })
   }
+}
+
+const cancelarRegistro = () => {
+  router.push('/login')
 }
 </script>
 
