@@ -25,13 +25,63 @@ const open = ref(false)
 const input = ref('')
 const messages = ref([{ from: 'bot', text: '¡Hola! ¿En qué puedo ayudarte?' }])
 
-function sendMessage() {
+const faq = [
+  {
+    keywords: ['revistas', 'recomendadas'],
+    answer: 'Puedes ver las revistas recomendadas en la sección "Revistas" de la página principal.',
+  },
+  {
+    keywords: ['línea', 'investigación'],
+    answer:
+      'Las líneas de investigación disponibles son: Negocios Internacionales, Finanzas, Marketing, Innovación y Tecnología.',
+  },
+  {
+    keywords: ['contacto', 'ayuda'],
+    answer: 'Para ayuda o contacto, por favor escribe a soporte@esan.edu.pe.',
+  },
+  // Agrega más preguntas frecuentes aquí
+]
+
+async function fetchApiResponse(userMessage) {
+  // Integración con Gemini API (Google AI)
+  try {
+    const response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCmn2OPT-EWF3w4fal9yMisu2BF3P-oSUY',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: userMessage }] }],
+        }),
+      },
+    )
+    if (!response.ok) throw new Error('Error en la API Gemini')
+    const data = await response.json()
+    // Ajusta según la estructura de la respuesta de Gemini
+    const geminiReply = data.candidates?.[0]?.content?.parts?.[0]?.text
+    return geminiReply || 'La API de Gemini no devolvió respuesta.'
+  } catch {
+    return 'No se pudo conectar con la API de Gemini.'
+  }
+}
+
+async function sendMessage() {
   if (!input.value) return
   messages.value.push({ from: 'user', text: input.value })
-  // Simulación de respuesta del bot
-  setTimeout(() => {
-    messages.value.push({ from: 'bot', text: 'Soy un bot de ejemplo.' })
-  }, 800)
+  const userMsg = input.value.toLowerCase()
+  let found = false
+  for (const item of faq) {
+    if (item.keywords.every((k) => userMsg.includes(k))) {
+      messages.value.push({ from: 'bot', text: item.answer })
+      found = true
+      break
+    }
+  }
+  if (!found) {
+    // Llama a la API externa si no hay respuesta local
+    const apiReply = await fetchApiResponse(input.value)
+    messages.value.push({ from: 'bot', text: apiReply })
+  }
   input.value = ''
 }
 </script>

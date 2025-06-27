@@ -34,7 +34,7 @@ const linksList = computed(() => [
   { title: 'Inicio', caption: '', icon: 'home', link: '/' },
   { title: 'Revistas', caption: '', icon: 'menu_book', link: '/revistas' },
   { title: 'Artículos', caption: '', icon: 'description', link: '/articulos' },
-  { title: 'Categorías', caption: '', icon: 'archive', link: '/categorias' },
+  { title: 'Noticias', caption: '', icon: 'newspaper', link: '/noticias' },
   { title: 'Guardados', caption: '', icon: 'label', link: '/guardados' },
 ])
 
