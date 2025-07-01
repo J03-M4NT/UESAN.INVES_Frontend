@@ -1,60 +1,54 @@
+<!-- TODO: PANEL PARA ADMINISTRADOR -->
+
 <template>
-  <div class="dashboard-container">
-    <!-- ...contenido existente del dashboard... -->
-    <q-page class="q-pa-md">
+  <q-page class="q-pa-md flex flex-center">
+    <div class="dashboard-container">
       <div class="text-h5 q-mb-md">
-        Bienvenido, {{ user.Nombre || 'Usuario' }} {{ user.Apellido || '' }}
+        Bienvenido, {{ user.nombre || 'Usuario' }} {{ user.apellido || '' }}
       </div>
-      <div class="text-subtitle1">Rol: {{ user.NombreRol || 'No asignado' }}</div>
+      <div class="text-subtitle1">
+        Rol: {{ user.rolId === 4 ? 'Administrador' : 'No asignado' }}
+      </div>
       <q-separator class="q-my-md" />
-      <!-- Panel para lector -->
-      <div v-if="user.RolId === 1">
-        <q-card class="q-mb-md">
-          <q-card-section>
-            <div class="text-subtitle2">📚 Leídos recientemente</div>
-          </q-card-section>
-          <q-list>
-            <q-item v-for="pub in publicaciones" :key="pub.PublicacionID">
-              <q-item-section>{{ pub.Nombre }}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-card>
-      </div>
-      <!-- Panel para administrador -->
-      <div v-else-if="user.RolId === 4">
-        <q-card class="q-mb-md">
-          <q-card-section>
-            <div class="text-subtitle2">⚙️ Panel de gestión</div>
-          </q-card-section>
-          <q-card-actions vertical>
-            <q-btn label="Usuarios" to="/admin/usuarios" color="primary" flat />
-            <q-btn label="Categorías" to="/admin/categorias" color="primary" flat />
-            <q-btn label="Publicaciones" to="/admin/publicaciones" color="primary" flat />
-          </q-card-actions>
-        </q-card>
-      </div>
-    </q-page>
-    <ChatBot />
-  </div>
+      <q-card class="q-mb-md">
+        <q-card-section>
+          <div class="text-subtitle2">⚙️ Panel de gestión</div>
+        </q-card-section>
+        <q-card-actions vertical>
+          <q-btn label="Usuarios" color="primary" flat />
+          <q-btn label="Categorías" color="primary" flat />
+          <q-btn label="Publicaciones" color="primary" flat />
+        </q-card-actions>
+      </q-card>
+    </div>
+  </q-page>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { api } from 'boot/axios'
-import ChatBot from 'src/components/auth/ChatBot.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const user = ref(JSON.parse(localStorage.getItem('user')) || {})
-const publicaciones = ref([])
 
-onMounted(async () => {
-  if (user.value?.UsuarioId) {
-    try {
-      const res = await api.get(`/api/publicaciones/recientes/${user.value.UsuarioId}`)
-      publicaciones.value = res.data
-    } catch (err) {
-      console.error('Error cargando publicaciones:', err)
-    }
+onMounted(() => {
+  if (Number(user.value.rolId) !== 4) {
+    router.push('/')
   }
 })
-// Puedes agregar más lógica aquí según el rol del usuario
 </script>
+
+<style scoped>
+.dashboard-container {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(44, 62, 80, 0.1);
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>
