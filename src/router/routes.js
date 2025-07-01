@@ -8,6 +8,7 @@ const routes = [
       { path: '/articulos', component: () => import('pages/ArticulosPage.vue') },
       { path: '/noticias', component: () => import('pages/NoticiasPage.vue') },
       { path: '/guardados', component: () => import('pages/GuardadosPage.vue') },
+      { path: '/admin/dashboard', component: () => import('pages/DashboardPage.vue') },
       // Rutas de la aplicación principal
     ],
   },

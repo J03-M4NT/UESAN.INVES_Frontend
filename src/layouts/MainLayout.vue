@@ -15,6 +15,18 @@
           v-bind="link"
           class="drawer-link"
         />
+        <!-- Solo mostrar el panel de control si el usuario es admin -->
+        <q-item
+          v-if="user && Number(user.rolId) === 4"
+          clickable
+          to="/admin/dashboard"
+          class="drawer-link"
+        >
+          <q-item-section>
+            <q-icon name="settings" />
+            <span class="q-ml-sm">Panel de Control</span>
+          </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
     <q-page-container>
@@ -26,9 +38,19 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
 import ChatBot from 'src/components/auth/ChatBot.vue'
+
+const user = ref(JSON.parse(localStorage.getItem('user')) || {})
+
+window.addEventListener('storage', () => {
+  user.value = JSON.parse(localStorage.getItem('user')) || {}
+})
+
+watchEffect(() => {
+  console.log('Usuario actual:', user.value)
+})
 
 const linksList = computed(() => [
   { title: 'Inicio', caption: '', icon: 'home', link: '/' },
