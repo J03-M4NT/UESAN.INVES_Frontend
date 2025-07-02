@@ -16,7 +16,11 @@
       <h2 class="text-h5 q-mb-md text-center text-white text-shadow">Servicios</h2>
       <div class="servicios-grid">
         <div v-for="(servicio, index) in servicios" :key="index" class="servicio-card">
-          <q-icon :name="servicio.icon" size="48px" class="servicio-icon" />
+          <img
+            src="https://th.bing.com/th/id/R.0612d98df402be48ef0bd38388fad856?rik=gbtdYNb6Tjj7pw&pid=ImgRaw&r=0"
+            alt="icono servicio"
+            class="servicio-img"
+          />
           <div class="servicio-nombre">{{ servicio.nombre }}</div>
         </div>
       </div>
@@ -117,12 +121,17 @@ const scrollTo = (id) => {
   justify-content: center;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
   transition: transform 0.2s;
+  padding: 0.5rem;
 }
 .servicio-card:hover {
   transform: translateY(-6px) scale(1.05);
 }
-.servicio-icon {
+.servicio-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
   margin-bottom: 0.5rem;
+  filter: brightness(0) invert(1); /* blanco sobre fondo rojo */
 }
 .servicio-nombre {
   font-size: 1rem;
