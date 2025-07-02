@@ -52,13 +52,15 @@
     <!-- Drawer lateral derecho para usuario -->
     <q-drawer v-model="rightDrawerOpen" side="right" bordered class="custom-drawer" width="260">
       <q-list class="drawer-list">
-        <q-item-label header class="drawer-header"> Bienvenido </q-item-label>
+        <q-item-label header class="drawer-header"> Bienvenido/a </q-item-label>
         <q-item>
           <q-item-section avatar>
             <q-icon name="account_circle" />
           </q-item-section>
           <q-item-section>
-            <div>{{ user?.nombre || 'Usuario' }}</div>
+            <div>
+              <b>{{ user?.nombre || 'Usuario' }}</b>
+            </div>
             <div class="text-caption">{{ user?.email }}</div>
             <div class="text-caption q-mt-xs">{{ getRoleName(user?.rolId) }}</div>
           </q-item-section>
@@ -79,8 +81,8 @@
             <q-item-section>Gestión de Usuarios</q-item-section>
           </q-item>
         </template>
-        <template v-else-if="user && Number(user.rolId) === 2">
-          <q-item clickable to="/perfil" class="drawer-link">
+        <template v-else-if="user && [1, 2, 3].includes(Number(user.rolId))">
+          <q-item clickable @click="goToPerfil" class="drawer-link">
             <q-item-section avatar>
               <q-icon name="person" />
             </q-item-section>
@@ -92,45 +94,16 @@
             </q-item-section>
             <q-item-section>Mis Artículos</q-item-section>
           </q-item>
-          <q-item clickable to="/mis-cursos" class="drawer-link">
+          <q-item
+            v-if="[1, 2].includes(Number(user.rolId))"
+            clickable
+            to="/mis-cursos"
+            class="drawer-link"
+          >
             <q-item-section avatar>
               <q-icon name="school" />
             </q-item-section>
             <q-item-section>Mis Cursos</q-item-section>
-          </q-item>
-        </template>
-        <template v-else-if="user && Number(user.rolId) === 1">
-          <q-item clickable to="/perfil" class="drawer-link">
-            <q-item-section avatar>
-              <q-icon name="person" />
-            </q-item-section>
-            <q-item-section>Mi Perfil</q-item-section>
-          </q-item>
-          <q-item clickable to="/mis-articulos" class="drawer-link">
-            <q-item-section avatar>
-              <q-icon name="article" />
-            </q-item-section>
-            <q-item-section>Mis Artículos</q-item-section>
-          </q-item>
-          <q-item clickable to="/mis-cursos" class="drawer-link">
-            <q-item-section avatar>
-              <q-icon name="school" />
-            </q-item-section>
-            <q-item-section>Mis Cursos</q-item-section>
-          </q-item>
-        </template>
-        <template v-else-if="user && Number(user.rolId) === 3">
-          <q-item clickable to="/perfil" class="drawer-link">
-            <q-item-section avatar>
-              <q-icon name="person" />
-            </q-item-section>
-            <q-item-section>Mi Perfil</q-item-section>
-          </q-item>
-          <q-item clickable to="/mis-articulos" class="drawer-link">
-            <q-item-section avatar>
-              <q-icon name="article" />
-            </q-item-section>
-            <q-item-section>Mis Artículos</q-item-section>
           </q-item>
         </template>
       </q-list>
@@ -199,6 +172,11 @@ function getRoleName(rolId) {
     default:
       return ''
   }
+}
+
+function goToPerfil() {
+  router.push('/perfil')
+  rightDrawerOpen.value = false
 }
 </script>
 
