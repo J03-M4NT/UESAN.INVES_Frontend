@@ -15,61 +15,83 @@
     <div class="q-mt-xl" id="servicios">
       <h2 class="text-h5 q-mb-md text-center text-white text-shadow">Servicios</h2>
       <div class="servicios-grid">
-        <div v-for="(servicio, index) in servicios" :key="index" class="servicio-card">
-          <q-icon :name="servicio.icon" size="48px" class="servicio-icon" />
+        <div
+          v-for="(servicio, index) in servicios"
+          :key="index"
+          class="servicio-card"
+          @click="scrollTo('servicio-' + index)"
+          style="cursor: pointer"
+        >
+          <q-icon :name="servicio.icon" size="38px" class="servicio-icon q-mb-sm" />
           <div class="servicio-nombre">{{ servicio.nombre }}</div>
         </div>
       </div>
     </div>
 
-    <!-- Revistas Recurrentes -->
-    <div class="q-mt-xl" id="revistas">
-      <h2 class="text-h5 q-mb-md">Revistas recurrentes</h2>
-      <q-card v-for="(revista, index) in revistasRecurrentes" :key="index" class="q-mb-md">
+    <!-- Secciones de información de cada servicio -->
+    <div
+      v-for="(servicio, index) in servicios"
+      :key="'info-' + index"
+      :id="'servicio-' + index"
+      class="servicio-info-section q-mb-xl"
+    >
+      <q-card class="q-mx-auto q-pa-md" style="max-width: 500px">
         <q-card-section>
-          <div class="text-subtitle1">{{ revista.nombre }}</div>
-          <div class="text-caption text-grey">Leída {{ revista.vecesLeida }} veces</div>
+          <div class="text-h6">{{ servicio.nombre }}</div>
+          <div class="text-body2 q-mt-sm">
+            {{ servicio.descripcion || 'Próximamente más información sobre este servicio.' }}
+          </div>
         </q-card-section>
       </q-card>
     </div>
 
     <!-- Call to Action -->
     <div class="q-mt-xl text-center">
-      <h3 class="text-h6">¿Quieres generar una publicación?</h3>
+      <h3 class="text-h6">¿Quieres saber más de las revistas publicadas?</h3>
       <q-btn color="primary" label="Ingresa aquí" />
     </div>
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { scroll } from 'quasar'
 
 const { setVerticalScrollPosition } = scroll
 
 const servicios = ref([
-  { nombre: 'Asesoría en proyectos de investigación', icon: 'school' },
-  { nombre: 'Acceso a convocatorias de fondos', icon: 'attach_money' },
-  { nombre: 'Publicación en revistas científicas', icon: 'menu_book' },
-  { nombre: 'Red de investigadores', icon: 'people' },
-  { nombre: 'Talleres y capacitaciones', icon: 'event' },
+  {
+    nombre: 'Asesoría en proyectos de investigación',
+    icon: 'school',
+    descripcion:
+      'Te ayudamos a planificar, ejecutar y mejorar tus proyectos de investigación con asesoría especializada.',
+  },
+  {
+    nombre: 'Acceso a convocatorias de fondos',
+    icon: 'attach_money',
+    descripcion:
+      'Infórmate y postula a las últimas convocatorias de financiamiento para tus investigaciones.',
+  },
+  {
+    nombre: 'Publicación en revistas científicas',
+    icon: 'menu_book',
+    descripcion:
+      'Te orientamos en el proceso de publicación de tus artículos en revistas científicas reconocidas.',
+  },
+  {
+    nombre: 'Red de investigadores',
+    icon: 'people',
+    descripcion: 'Conéctate y colabora con otros investigadores de la comunidad académica.',
+  },
+  {
+    nombre: 'Talleres y capacitaciones',
+    icon: 'event',
+    descripcion:
+      'Participa en talleres y capacitaciones para fortalecer tus competencias investigativas.',
+  },
 ])
 
-// Simulación de revistas con contador de lecturas
-const revistas = ref([
-  { nombre: 'Revista Científica UXYZ – Vol. 12, No. 3', vecesLeida: 12 },
-  { nombre: 'Avances en Investigación', vecesLeida: 8 },
-  { nombre: 'Innovación Académica', vecesLeida: 5 },
-  { nombre: 'Ciencia y Sociedad', vecesLeida: 3 },
-  { nombre: 'Gestión Empresarial', vecesLeida: 2 },
-])
-
-// Las 3 revistas más leídas
-const revistasRecurrentes = computed(() =>
-  [...revistas.value].sort((a, b) => b.vecesLeida - a.vecesLeida).slice(0, 3),
-)
-
-const scrollTo = (id) => {
+function scrollTo(id) {
   const el = document.getElementById(id)
   if (el) setVerticalScrollPosition(window, el.offsetTop, 500)
 }
@@ -117,12 +139,17 @@ const scrollTo = (id) => {
   justify-content: center;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
   transition: transform 0.2s;
+  padding: 0.5rem;
 }
 .servicio-card:hover {
   transform: translateY(-6px) scale(1.05);
 }
-.servicio-icon {
+.servicio-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
   margin-bottom: 0.5rem;
+  filter: brightness(0) invert(1); /* blanco sobre fondo rojo */
 }
 .servicio-nombre {
   font-size: 1rem;
