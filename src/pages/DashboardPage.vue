@@ -61,7 +61,7 @@
           </q-card-section>
         </q-card>
         <div class="q-mt-md">
-          <q-btn color="secondary" label="btn_insercion" />
+          <q-btn color="secondary" label="BTN_INSERCION" @click="insertarListaCerrada" />
         </div>
       </div>
     </div>
@@ -111,27 +111,24 @@
 </template>
 
 <script setup>
-// Importaciones principales
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import * as XLSX from 'xlsx' // Librería para leer archivos Excel
+import * as XLSX from 'xlsx'
+import { api } from 'boot/axios'
 
-// Usuario actual y protección de ruta
 const user = ref(JSON.parse(localStorage.getItem('user')) || {})
 const router = useRouter()
 
 // ==================== CONTAINER 1: PROFESORES (TEST) ====================
-const fileInput = ref(null) // Referencia al input de archivo
-const fileImported = ref(false) // Estado de importación
-const excelPreview = ref([]) // Datos para la tabla de vista previa
-const excelColumns = ref([]) // Columnas para la tabla
+const fileInput = ref(null)
+const fileImported = ref(false)
+const excelPreview = ref([])
+const excelColumns = ref([])
 
-// Abrir el selector de archivos
 function openFile() {
   fileInput.value && fileInput.value.click()
 }
 
-// Leer y procesar archivo Excel/CSV
 function onFileChange(e) {
   const file = e.target.files[0]
   if (!file) return
@@ -139,23 +136,42 @@ function onFileChange(e) {
   const reader = new FileReader()
   reader.onload = (evt) => {
     const data = evt.target.result
-    // Leer archivo con XLSX (soporta .xlsx, .xls, .csv)
     const workbook = XLSX.read(data, { type: 'array' })
     const sheetName = workbook.SheetNames[0]
     const worksheet = workbook.Sheets[sheetName]
-    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 })
+    const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
     if (json.length) {
-      excelColumns.value = json[0].map((h, i) => ({
-        name: `col${i}`,
-        label: h,
-        field: (row) => row[i],
+      // Normaliza los nombres de las columnas
+      const normalized = json.map((row) => ({
+        ...row,
+        ISSN: row.ISSN || row.Issn || row['issn'] || '',
+        ISSN2: row.ISSN2 || row.Issn2 || row['issn2'] || '',
+        ISSN3: row.ISSN3 || row.Issn3 || row['issn3'] || '',
+        ABDC: row.ABDC || row.abdc || row['Abdc'] || '', // Normaliza ABDC también
+      }))
+      excelColumns.value = Object.keys(normalized[0]).map((key) => ({
+        name: key,
+        label: key,
+        field: key,
         align: 'left',
       }))
-      excelPreview.value = json.slice(1) // Mostrar todas las filas
+      excelPreview.value = normalized
       fileImported.value = true
     }
   }
   reader.readAsArrayBuffer(file)
+}
+
+// Importar registros al backend
+const insertarListaCerrada = async () => {
+  try {
+    await api.post('/api/ListasCerradas/importar', excelPreview.value)
+    // Notifica éxito
+    alert('Registros insertados correctamente.')
+  } catch (error) {
+    console.error(error)
+    alert('Error al insertar registros.')
+  }
 }
 
 // ==================== CONTAINER 2: REVISTAS ====================
@@ -164,12 +180,10 @@ const fileImportedRevistas = ref(false)
 const excelPreviewRevistas = ref([])
 const excelColumnsRevistas = ref([])
 
-// Abrir el selector de archivos para revistas
 function openFileRevistas() {
   fileInputRevistas.value && fileInputRevistas.value.click()
 }
 
-// Leer y procesar archivo Excel/CSV para revistas
 function onFileChangeRevistas(e) {
   const file = e.target.files[0]
   if (!file) return
@@ -188,14 +202,15 @@ function onFileChangeRevistas(e) {
         field: (row) => row[i],
         align: 'left',
       }))
-      excelPreviewRevistas.value = json.slice(1) // Mostrar todas las filas
+      excelPreviewRevistas.value = json
+        .slice(1)
+        .map((row) => Object.fromEntries(json[0].map((col, i) => [col, row[i]])))
       fileImportedRevistas.value = true
     }
   }
   reader.readAsArrayBuffer(file)
 }
 
-// Redirección si no es admin
 onMounted(() => {
   if (Number(user.value.rolId) !== 4) {
     router.push('/')
