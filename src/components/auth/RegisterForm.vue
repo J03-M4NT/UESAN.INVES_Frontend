@@ -192,6 +192,11 @@ const registrarUsuario = async () => {
     return
   }
 
+  // Agrega la fecha y hora actual antes de enviar
+  form.FechaRegistro = new Date().toISOString()
+
+  console.log('Datos enviados:', JSON.stringify(form))
+
   try {
     await api.post('/api/usuarios', form)
     $q.notify({ type: 'positive', message: 'Registro exitoso.' })
