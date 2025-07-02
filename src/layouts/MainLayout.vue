@@ -4,6 +4,14 @@
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
         <q-toolbar-title> Vicerrectorado de Investigación </q-toolbar-title>
+        <q-btn
+          flat
+          dense
+          round
+          icon="account_circle"
+          aria-label="Cuenta"
+          @click="toggleRightDrawer"
+        />
       </q-toolbar>
     </q-header>
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="custom-drawer">
@@ -40,6 +48,94 @@
         </q-item>
       </q-list>
     </q-drawer>
+
+    <!-- Drawer lateral derecho para usuario -->
+    <q-drawer v-model="rightDrawerOpen" side="right" bordered class="custom-drawer" width="260">
+      <q-list class="drawer-list">
+        <q-item-label header class="drawer-header"> Bienvenido </q-item-label>
+        <q-item>
+          <q-item-section avatar>
+            <q-icon name="account_circle" />
+          </q-item-section>
+          <q-item-section>
+            <div>{{ user?.nombre || 'Usuario' }}</div>
+            <div class="text-caption">{{ user?.email }}</div>
+            <div class="text-caption q-mt-xs">{{ getRoleName(user?.rolId) }}</div>
+          </q-item-section>
+        </q-item>
+        <q-separator spaced />
+        <!-- Opciones según el rol -->
+        <template v-if="user && Number(user.rolId) === 4">
+          <q-item clickable to="/admin/perfil" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="manage_accounts" />
+            </q-item-section>
+            <q-item-section>Perfil Admin</q-item-section>
+          </q-item>
+          <q-item clickable to="/admin/usuarios" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="group" />
+            </q-item-section>
+            <q-item-section>Gestión de Usuarios</q-item-section>
+          </q-item>
+        </template>
+        <template v-else-if="user && Number(user.rolId) === 2">
+          <q-item clickable to="/perfil" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="person" />
+            </q-item-section>
+            <q-item-section>Mi Perfil</q-item-section>
+          </q-item>
+          <q-item clickable to="/mis-articulos" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="article" />
+            </q-item-section>
+            <q-item-section>Mis Artículos</q-item-section>
+          </q-item>
+          <q-item clickable to="/mis-cursos" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="school" />
+            </q-item-section>
+            <q-item-section>Mis Cursos</q-item-section>
+          </q-item>
+        </template>
+        <template v-else-if="user && Number(user.rolId) === 1">
+          <q-item clickable to="/perfil" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="person" />
+            </q-item-section>
+            <q-item-section>Mi Perfil</q-item-section>
+          </q-item>
+          <q-item clickable to="/mis-articulos" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="article" />
+            </q-item-section>
+            <q-item-section>Mis Artículos</q-item-section>
+          </q-item>
+          <q-item clickable to="/mis-cursos" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="school" />
+            </q-item-section>
+            <q-item-section>Mis Cursos</q-item-section>
+          </q-item>
+        </template>
+        <template v-else-if="user && Number(user.rolId) === 3">
+          <q-item clickable to="/perfil" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="person" />
+            </q-item-section>
+            <q-item-section>Mi Perfil</q-item-section>
+          </q-item>
+          <q-item clickable to="/mis-articulos" class="drawer-link">
+            <q-item-section avatar>
+              <q-icon name="article" />
+            </q-item-section>
+            <q-item-section>Mis Artículos</q-item-section>
+          </q-item>
+        </template>
+      </q-list>
+    </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -78,11 +174,31 @@ function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
 
+const rightDrawerOpen = ref(false)
+function toggleRightDrawer() {
+  rightDrawerOpen.value = !rightDrawerOpen.value
+}
+
 // Función para cerrar sesión
 function logout() {
   localStorage.removeItem('user')
   localStorage.removeItem('token')
   router.push('/login')
+}
+
+function getRoleName(rolId) {
+  switch (Number(rolId)) {
+    case 1:
+      return 'Estudiante'
+    case 2:
+      return 'Profesor'
+    case 3:
+      return 'Personal externo'
+    case 4:
+      return 'Administrador'
+    default:
+      return ''
+  }
 }
 </script>
 
