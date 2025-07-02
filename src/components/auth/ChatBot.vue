@@ -46,7 +46,7 @@ async function fetchApiResponse(userMessage) {
   // Integración con Gemini API (Google AI)
   try {
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCmn2OPT-EWF3w4fal9yMisu2BF3P-oSUY',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCmn2OPT-EWF3w4fal9yMisu2BF3P-oSUY',
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
