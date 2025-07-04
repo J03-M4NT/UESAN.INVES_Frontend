@@ -105,14 +105,20 @@ const eliminarGuardado = async (listasCerradasId) => {
   try {
     if (user && user.usuarioId) {
       await api.delete(`/api/ListasCerradasGuardadas/${user.usuarioId}/${listasCerradasId}`)
-      // Recargar guardados desde backend para asegurar consistencia
-      const res = await api.get(`/api/ListasCerradasGuardadas?usuarioId=${user.usuarioId}`)
-      guardados.value = res.data['$values'] || res.data || []
+      // Elimina solo el guardado correspondiente de la UI
+      guardados.value = guardados.value.filter((g) => g.listasCerradasId !== listasCerradasId)
     }
   } catch (err) {
     if (err.response && err.response.status === 404) {
-      guardados.value = []
+      guardados.value = guardados.value.filter((g) => g.listasCerradasId !== listasCerradasId)
     } else {
+      // Si hay error, recarga desde backend para asegurar consistencia
+      try {
+        const res = await api.get(`/api/ListasCerradasGuardadas?usuarioId=${user.usuarioId}`)
+        guardados.value = res.data['$values'] || res.data || []
+      } catch (e) {
+        console.error('Error recargando guardados:', e)
+      }
       console.error('Error eliminando guardado:', err)
     }
   }

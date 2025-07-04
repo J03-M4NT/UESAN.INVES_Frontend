@@ -63,6 +63,16 @@
                 :color="estaGuardada(revista.listasCerradasId) ? 'red' : 'grey'"
                 class="q-ml-md"
               />
+              <!-- Botón Eliminar solo para admin -->
+              <q-btn
+                v-if="esAdmin.value"
+                flat
+                icon="delete"
+                color="negative"
+                class="q-ml-sm"
+                @click="confirmarEliminar(revista)"
+                :disable="eliminandoId === revista.listasCerradasId"
+              />
             </div>
           </q-card-section>
           <q-card-actions align="right">
@@ -100,6 +110,35 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Diálogo de confirmación de eliminación -->
+    <q-dialog v-model="dialogoEliminar">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-icon name="warning" color="warning" size="2rem" class="q-mr-md" />
+          <div>
+            ¿Estás seguro de que deseas eliminar la revista <b>{{ revistaAEliminar?.nombre }}</b
+            >?
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            label="Cancelar"
+            color="primary"
+            v-close-popup
+            @click="dialogoEliminar = false"
+          />
+          <q-btn
+            flat
+            label="Eliminar"
+            color="negative"
+            :loading="eliminando"
+            @click="eliminarRevista"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -118,6 +157,45 @@ const lineas = ref([])
 const dialogoDetalle = ref(false)
 const revistaDetalle = ref({})
 const guardadosIds = ref([])
+// Estado para eliminar
+const dialogoEliminar = ref(false)
+const revistaAEliminar = ref(null)
+const eliminando = ref(false)
+const eliminandoId = ref(null)
+
+// Detectar si es admin (solo al cargar la página)
+const user = JSON.parse(localStorage.getItem('user'))
+console.log('Usuario actual:', user)
+let rol = user && (user.rol || user.role)
+if (rol) rol = rol.toLowerCase()
+const esAdmin = ref(rol === 'admin')
+// Confirmar eliminación
+function confirmarEliminar(revista) {
+  revistaAEliminar.value = revista
+  dialogoEliminar.value = true
+}
+
+// Eliminar revista
+async function eliminarRevista() {
+  if (!revistaAEliminar.value) return
+  eliminando.value = true
+  eliminandoId.value = revistaAEliminar.value.listasCerradasId
+  try {
+    await api.delete(`/api/ListasCerradas/${revistaAEliminar.value.listasCerradasId}`)
+    revistas.value = revistas.value.filter(
+      (r) => r.listasCerradasId !== revistaAEliminar.value.listasCerradasId,
+    )
+    $q.notify({ type: 'positive', message: 'Revista eliminada correctamente.' })
+    dialogoEliminar.value = false
+    revistaAEliminar.value = null
+  } catch (err) {
+    $q.notify({ type: 'negative', message: 'Error al eliminar la revista.' })
+    console.error(err)
+  } finally {
+    eliminando.value = false
+    eliminandoId.value = null
+  }
+}
 
 onMounted(async () => {
   try {
