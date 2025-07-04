@@ -30,9 +30,11 @@
           to="/admin/dashboard"
           class="drawer-link"
         >
-          <q-item-section>
+          <q-item-section avatar>
             <q-icon name="settings" />
-            <span class="q-ml-sm">Panel de Control</span>
+          </q-item-section>
+          <q-item-section>
+            <span>Panel de Control</span>
           </q-item-section>
         </q-item>
         <q-item
@@ -41,25 +43,14 @@
           to="/admin/propuestas"
           class="drawer-link"
         >
-          <q-item-section>
+          <q-item-section avatar>
             <q-icon name="assignment" />
-            <span class="q-ml-sm">Propuestas</span>
-            <q-badge color="primary" align="top right" v-if="propuestasCount > 0">{{
-              propuestasCount
-            }}</q-badge>
           </q-item-section>
-        </q-item>
-        <q-item
-          v-if="user && Number(user.rolId) === 4"
-          clickable
-          to="/filtrar-roles"
-          class="drawer-link"
-        >
           <q-item-section>
-            <q-icon name="manage_accounts" />
-            <span class="q-ml-sm">Filtrar por roles</span>
+            <span>Propuestas</span>
           </q-item-section>
         </q-item>
+        <!-- Eliminado: Filtrar por roles para admins -->
         <!-- Espaciador para empujar el botón hacia abajo -->
         <q-space />
         <!-- Botón de cerrar sesión al pie -->
