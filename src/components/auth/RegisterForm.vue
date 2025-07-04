@@ -183,7 +183,7 @@ const roles = [
   { label: 'Estudiante', value: 1 },
   { label: 'Profesor', value: 2 },
   { label: 'Personal Externo', value: 3 },
-  { label: 'Administrador', value: 4 },
+  //{ label: 'Administrador', value: 4 },
 ]
 
 const registrarUsuario = async () => {
