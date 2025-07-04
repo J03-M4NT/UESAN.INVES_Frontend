@@ -152,7 +152,14 @@ onMounted(async () => {
     if (user && user.usuarioId) {
       try {
         const res = await api.get(`/api/ListasCerradasGuardadas?usuarioId=${user.usuarioId}`)
-        guardadosIds.value = (res.data['$values'] || res.data || []).map((g) => g.listasCerradasId)
+        // Solo IDs únicos y válidos del usuario actual
+        guardadosIds.value = Array.from(
+          new Set(
+            (res.data['$values'] || res.data || [])
+              .filter((g) => g.usuarioId === user.usuarioId)
+              .map((g) => g.listasCerradasId),
+          ),
+        )
       } catch (err) {
         if (err.response && err.response.status === 404) {
           guardadosIds.value = []
@@ -160,6 +167,8 @@ onMounted(async () => {
           console.error('Error cargando guardados:', err)
         }
       }
+    } else {
+      guardadosIds.value = []
     }
   } catch (err) {
     console.error('Error cargando datos:', err)
@@ -209,7 +218,17 @@ const guardarRevista = async (listasCerradasId) => {
       $q.notify({ type: 'positive', message: 'Guardado con éxito' })
     } else {
       // Eliminar guardado
-      await api.delete(`/api/ListasCerradasGuardadas/${user.usuarioId}/${listasCerradasId}`)
+      try {
+        await api.delete(`/api/ListasCerradasGuardadas/${user.usuarioId}/${listasCerradasId}`)
+      } catch (err) {
+        // Si es 404, lo consideramos éxito silencioso (ya no existe)
+        if (!(err.response && err.response.status === 404)) {
+          $q.notify({ type: 'negative', message: 'Error al quitar guardado' })
+          console.error(err)
+          return
+        }
+        // Si es 404, no mostrar nada en consola
+      }
       guardadosIds.value = guardadosIds.value.filter((id) => id !== listasCerradasId)
       $q.notify({ type: 'info', message: 'Guardado eliminado' })
     }

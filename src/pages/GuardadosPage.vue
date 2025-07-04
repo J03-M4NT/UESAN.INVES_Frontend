@@ -105,10 +105,16 @@ const eliminarGuardado = async (listasCerradasId) => {
   try {
     if (user && user.usuarioId) {
       await api.delete(`/api/ListasCerradasGuardadas/${user.usuarioId}/${listasCerradasId}`)
-      guardados.value = guardados.value.filter((g) => g.listasCerradasId !== listasCerradasId)
+      // Recargar guardados desde backend para asegurar consistencia
+      const res = await api.get(`/api/ListasCerradasGuardadas?usuarioId=${user.usuarioId}`)
+      guardados.value = res.data['$values'] || res.data || []
     }
   } catch (err) {
-    console.error('Error eliminando guardado:', err)
+    if (err.response && err.response.status === 404) {
+      guardados.value = []
+    } else {
+      console.error('Error eliminando guardado:', err)
+    }
   }
 }
 
@@ -124,9 +130,11 @@ const getCategoriaNombre = (categoriaId) => {
 }
 
 const guardadosFiltrados = computed(() => {
-  // Cruza los guardados con la tabla de revistas
+  // Solo mostrar guardados del usuario actual y cruzar con revistas
   const unicos = {}
   for (const g of guardados.value) {
+    // Si el guardado no es del usuario actual, lo ignora
+    if (g.usuarioId !== user.usuarioId) continue
     if (!unicos[g.listasCerradasId]) {
       const revista = revistas.value.find((r) => r.listasCerradasId === g.listasCerradasId)
       unicos[g.listasCerradasId] = { ...g, revista }
