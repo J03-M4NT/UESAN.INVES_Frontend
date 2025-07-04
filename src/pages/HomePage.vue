@@ -40,6 +40,7 @@
               </q-item-section>
               <q-item-section>{{ acceso.label }}</q-item-section>
             </q-item>
+            <!-- Botón de Filtrar por roles eliminado, ahora solo en MainLayout -->
           </q-list>
         </div>
 
@@ -124,6 +125,7 @@ const usuario = {
   nombre: 'MIJHAIL JAFETT',
   apellido: 'MEDINA TELLO',
   fotoUrl: 'https://ui-avatars.com/api/?name=Mijhail+Medina',
+  rol: 'Administrador', // Añadido campo de rol
 }
 
 const accesos = [

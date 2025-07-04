@@ -12,6 +12,7 @@ const routes = [
       { path: '/admin/usuarios', component: () => import('pages/GestionUsuarios.vue') },
       { path: '/admin/propuestas', component: () => import('pages/AdminPropuestasPage.vue') },
       { path: '/mis-articulos', component: () => import('pages/Propuestas.vue') },
+      { path: '/filtrar-roles', component: () => import('pages/FiltrarRolesPage.vue') },
 
       // Rutas de la aplicación principal
     ],
