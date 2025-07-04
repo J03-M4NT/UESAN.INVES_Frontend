@@ -32,7 +32,7 @@
         </q-card-section>
       </q-card>
       <!-- Espacio para el último post de Twitter/X -->
-      <div class="q-mt-xl text-center">
+      <div class="q-mt-xl">
         <q-separator spaced />
         <div class="text-h6 q-mb-sm">Última novedad en Twitter/X</div>
         <!-- Aquí se inserta el widget de Twitter/X -->
@@ -109,13 +109,14 @@ onMounted(() => {
 /* Centrar el widget de Twitter/X sin "apretarlo" y respetando el ancho original */
 .twitter-center {
   width: 100%;
-  margin-top: 1.5rem;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  margin-top: 1.2rem;
 }
 .twitter-center blockquote.twitter-tweet {
-  margin: 0 auto !important;
-  max-width: 550px; /* Ancho natural del embed de Twitter */
+  width: 100% !important;
+  max-width: 900px !important;
+  min-width: 350px !important;
+  box-sizing: border-box;
 }
 </style>
