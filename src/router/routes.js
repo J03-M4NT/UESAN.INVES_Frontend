@@ -9,6 +9,9 @@ const routes = [
       { path: '/noticias', component: () => import('pages/NoticiasPage.vue') },
       { path: '/guardados', component: () => import('pages/GuardadosPage.vue') },
       { path: '/admin/dashboard', component: () => import('pages/DashboardPage.vue') },
+      { path: '/admin/usuarios', component: () => import('pages/GestionUsuarios.vue') },
+      { path: '/admin/propuestas', component: () => import('pages/AdminPropuestasPage.vue') },
+      { path: '/mis-articulos', component: () => import('pages/Propuestas.vue') },
       // Rutas de la aplicación principal
     ],
   },
