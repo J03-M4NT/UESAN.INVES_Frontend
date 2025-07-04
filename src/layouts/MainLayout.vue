@@ -8,6 +8,15 @@
           flat
           dense
           round
+          :icon="isDark ? 'dark_mode' : 'light_mode'"
+          aria-label="Cambiar modo"
+          @click="toggleDarkMode"
+          class="q-mr-sm"
+        />
+        <q-btn
+          flat
+          dense
+          round
           icon="account_circle"
           aria-label="Cuenta"
           @click="toggleRightDrawer"
@@ -151,10 +160,13 @@ import PerfilModal from 'components/auth/PerfilModal.vue'
 import { useRouter } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
 import ChatBot from 'src/components/auth/ChatBot.vue'
+import { useQuasar } from 'quasar'
 
 const router = useRouter()
 const user = ref(JSON.parse(localStorage.getItem('user')) || {})
 const showPerfilModal = ref(false)
+const $q = useQuasar()
+const isDark = ref($q.dark.isActive)
 
 window.addEventListener('storage', () => {
   user.value = JSON.parse(localStorage.getItem('user')) || {}
@@ -222,9 +234,30 @@ function fetchPropuestasCount() {
 if (user.value && Number(user.value.rolId) === 4) {
   fetchPropuestasCount()
 }
+
+function toggleDarkMode() {
+  $q.dark.set(!$q.dark.isActive)
+  isDark.value = $q.dark.isActive
+}
 </script>
 
 <style scoped>
+:root {
+  --main-bg: #fff;
+  --main-text: #222;
+}
+body.body--dark,
+.q-dark {
+  --main-bg: #181818;
+  --main-text: #fff;
+}
+.q-page-container,
+.q-page,
+.dashboard-container,
+.import-container {
+  background: var(--main-bg) !important;
+  color: var(--main-text) !important;
+}
 .custom-header {
   background: #d32f2f !important;
   color: #fff;

@@ -75,13 +75,87 @@
             </button>
           </div>
           <div class="forgot-password">
-            <a href="#">¿Has olvidado tu contraseña?</a>
+            <button type="button" class="forgot-link-btn" @click="openForgotPasswordModal">
+              ¿Has olvidado tu contraseña?
+            </button>
           </div>
           <button type="submit" class="login-btn" :disabled="loading">Ingresar</button>
           <div class="register-link">
             <a href="#" @click.prevent="goToRegister">Crear cuenta</a>
           </div>
         </form>
+        <!-- Modal de recuperación de contraseña -->
+        <q-dialog v-model="forgotDialog" persistent>
+          <q-card style="min-width: 350px">
+            <q-card-section>
+              <div v-if="step === 1">
+                <div class="text-h6">Recuperar contraseña</div>
+                <div class="q-mt-md">
+                  Ingresa tu correo electrónico para recibir un código de verificación.
+                </div>
+                <q-input
+                  v-model="forgotEmail"
+                  label="Correo electrónico"
+                  type="email"
+                  class="q-mt-md"
+                  autofocus
+                />
+              </div>
+              <div v-else-if="step === 2">
+                <div class="text-h6">Verifica tu código</div>
+                <div class="q-mt-md">Revisa tu correo e ingresa el código recibido.</div>
+                <q-input v-model="codeInput" label="Código" class="q-mt-md" autofocus />
+              </div>
+              <div v-else-if="step === 3">
+                <div class="text-h6">Nueva contraseña</div>
+                <div class="q-mt-md">Ingresa y confirma tu nueva contraseña.</div>
+                <q-input
+                  v-model="newPassword"
+                  label="Nueva contraseña"
+                  type="password"
+                  class="q-mt-md"
+                />
+                <q-input
+                  v-model="confirmPassword"
+                  label="Repetir nueva contraseña"
+                  type="password"
+                  class="q-mt-md"
+                />
+              </div>
+            </q-card-section>
+            <q-card-actions align="right">
+              <q-btn
+                flat
+                label="Cancelar"
+                color="grey"
+                v-close-popup
+                @click="forgotDialog = false"
+                :disable="forgotLoading"
+              />
+              <q-btn
+                v-if="step === 1"
+                label="Enviar código"
+                color="primary"
+                @click="sendRecoveryCode"
+                :loading="forgotLoading"
+              />
+              <q-btn
+                v-else-if="step === 2"
+                label="Validar código"
+                color="primary"
+                @click="verifyCode"
+                :loading="forgotLoading"
+              />
+              <q-btn
+                v-else-if="step === 3"
+                label="Actualizar contraseña"
+                color="primary"
+                @click="setNewPassword"
+                :loading="forgotLoading"
+              />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
       </div>
     </div>
     <!-- Panel derecho - Bienvenida con imagen -->
@@ -111,6 +185,100 @@ const loading = ref(false)
 const codigo = ref('')
 const password = ref('')
 const showPassword = ref(false)
+
+// Recuperación de contraseña
+const forgotDialog = ref(false)
+const step = ref(1) // 1: correo, 2: código, 3: nueva contraseña
+const forgotEmail = ref('')
+const forgotCode = ref('')
+const sentCode = ref(false)
+const codeInput = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const forgotLoading = ref(false)
+
+function openForgotPasswordModal() {
+  forgotDialog.value = true
+  step.value = 1
+  forgotEmail.value = ''
+  forgotCode.value = ''
+  codeInput.value = ''
+  newPassword.value = ''
+  confirmPassword.value = ''
+  sentCode.value = false
+}
+
+async function sendRecoveryCode() {
+  if (!forgotEmail.value) {
+    $q.notify({ type: 'warning', message: 'Ingresa tu correo electrónico.' })
+    return
+  }
+  forgotLoading.value = true
+  try {
+    // Llamada al backend para enviar código
+    await api.post('/api/usuarios/forgot-password', { correo: forgotEmail.value })
+    $q.notify({ type: 'positive', message: 'Código enviado a tu correo.' })
+    step.value = 2
+    sentCode.value = true
+  } catch (e) {
+    $q.notify({
+      type: 'negative',
+      message: e.response?.data?.message || 'Error enviando el código.',
+    })
+  } finally {
+    forgotLoading.value = false
+  }
+}
+
+async function verifyCode() {
+  if (!codeInput.value) {
+    $q.notify({ type: 'warning', message: 'Ingresa el código recibido.' })
+    return
+  }
+  forgotLoading.value = true
+  try {
+    // Llamada al backend para validar código
+    await api.post('/api/usuarios/verify-code', {
+      correo: forgotEmail.value,
+      codigo: codeInput.value,
+    })
+    $q.notify({ type: 'positive', message: 'Código verificado. Ingresa tu nueva contraseña.' })
+    step.value = 3
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.response?.data?.message || 'Código incorrecto.' })
+  } finally {
+    forgotLoading.value = false
+  }
+}
+
+async function setNewPassword() {
+  if (!newPassword.value || !confirmPassword.value) {
+    $q.notify({ type: 'warning', message: 'Completa ambos campos de contraseña.' })
+    return
+  }
+  if (newPassword.value !== confirmPassword.value) {
+    $q.notify({ type: 'warning', message: 'Las contraseñas no coinciden.' })
+    return
+  }
+  forgotLoading.value = true
+  try {
+    // Llamada al backend para cambiar contraseña
+    await api.post('/api/usuarios/reset-password', {
+      correo: forgotEmail.value,
+      codigo: codeInput.value,
+      nuevaContrasena: newPassword.value,
+    })
+    $q.notify({ type: 'positive', message: 'Contraseña actualizada. Ahora puedes iniciar sesión.' })
+    forgotDialog.value = false
+  } catch (e) {
+    $q.notify({
+      type: 'negative',
+      message: e.response?.data?.message || 'Error actualizando la contraseña.',
+    })
+  } finally {
+    forgotLoading.value = false
+  }
+}
 
 const onSubmit = async () => {
   loading.value = true
@@ -236,11 +404,15 @@ function goToRegister() {
   text-align: right;
   margin-bottom: 1.2rem;
 }
-.forgot-password a {
+.forgot-link-btn {
+  background: none;
+  border: none;
   color: #fff;
   font-size: 0.95rem;
   opacity: 0.8;
   text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
 }
 .login-btn {
   width: 100%;
