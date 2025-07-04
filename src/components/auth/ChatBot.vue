@@ -21,67 +21,74 @@
 
 <script setup>
 import { ref } from 'vue'
+
 const open = ref(false)
 const input = ref('')
-const messages = ref([{ from: 'bot', text: '¡Hola! ¿En qué puedo ayudarte?' }])
+const messages = ref([
+  {
+    from: 'bot',
+    text: 'Hola. Soy el asistente del Vicerrectorado de Investigación (VDI) de ESAN. ¿En qué puedo ayudarte?',
+  },
+])
 
-const faq = [
-  {
-    keywords: ['revistas', 'recomendadas'],
-    answer: 'Puedes ver las revistas recomendadas en la sección "Revistas" de la página principal.',
-  },
-  {
-    keywords: ['línea', 'investigación'],
-    answer:
-      'Las líneas de investigación disponibles son: Negocios Internacionales, Finanzas, Marketing, Innovación y Tecnología.',
-  },
-  {
-    keywords: ['contacto', 'ayuda'],
-    answer: 'Para ayuda o contacto, por favor escribe a soporte@esan.edu.pe.',
-  },
-  // Agrega más preguntas frecuentes aquí
-]
+const GEMINI_API_KEY = 'AIzaSyDmWAxUEsdo2nabHkpWDaJy6qU5SziNkRw'
 
-async function fetchApiResponse(userMessage) {
-  // Integración con Gemini API (Google AI)
+// 🎯 Este es el contexto que se envía en cada prompt
+const CONTEXTO_VDI = `
+Hola. A partir de ahora, actúa como un asistente virtual de la intranet del Vicerrectorado de Investigación (VDI) de la Universidad ESAN. Tu tarea es responder consultas de profesores, alumnos, o personal externo sobre temas relacionados con la publicación académica, revistas científicas, patentes, proyectos de investigación, casos de estudio y líneas de investigación institucionales, únicamente usando la información que se te ha proporcionado a continuación.
+
+📌 CONTEXTO GENERAL:
+El Vicerrectorado de Investigación (VDI) lidera, promueve y gestiona proyectos de investigación con alto impacto académico e internacional. Se encarga de fomentar publicaciones científicas en revistas indexadas (SCOPUS, WoS, AJG, etc.), apoyar en la generación de artículos, libros, casos de estudio y patentes, facilitar el acceso a fondos nacionales e internacionales, y difundir producción científica a través de ESAN Ediciones y revistas institucionales como JEFAS.
+
+📘 TIPOS DE PRODUCTOS APOYADOS:
+- Papers (revistas indexadas)
+- Libros y capítulos (ESAN Ediciones)
+- Casos de estudio (educativos o empresariales)
+- Patentes (desarrollos tecnológicos)
+- Proyectos (buscan financiamiento)
+
+🧪 EJEMPLOS DE PATENTES:
+- Soporte ergonómico para laptop
+- Aplicación Qarvis (educativa en química)
+
+📚 LÍNEAS DE INVESTIGACIÓN:
+Administración, Derecho, Psicología, Medio Ambiente, Marketing, Sistemas de Información, Economía y Finanzas, Supply Chain, Turismo y Hotelería, entre otros.
+
+🎓 IMPORTANTE:
+Siempre responde en el contexto del VDI. No inventes información. Si no sabes algo, sugiere consultar con el equipo del VDI o visitar https://investigaciones.esan.edu.pe
+`
+
+async function fetchGeminiResponse(userInput) {
+  const fullPrompt = `${CONTEXTO_VDI}\n\n👤 Usuario pregunta:\n${userInput}`
+
   try {
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCmn2OPT-EWF3w4fal9yMisu2BF3P-oSUY',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' +
+        GEMINI_API_KEY,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: userMessage }] }],
+          contents: [{ parts: [{ text: fullPrompt }] }],
         }),
       },
     )
-    if (!response.ok) throw new Error('Error en la API Gemini')
+
+    if (!response.ok) throw new Error('Error al conectar con Gemini API')
     const data = await response.json()
-    // Ajusta según la estructura de la respuesta de Gemini
     const geminiReply = data.candidates?.[0]?.content?.parts?.[0]?.text
-    return geminiReply || 'La API de Gemini no devolvió respuesta.'
-  } catch {
-    return 'No se pudo conectar con la API de Gemini.'
+    return geminiReply || 'No se obtuvo respuesta de la IA.'
+  } catch (err) {
+    console.error(err)
+    return '❌ No se pudo conectar con el asistente. Intenta más tarde.'
   }
 }
 
 async function sendMessage() {
   if (!input.value) return
   messages.value.push({ from: 'user', text: input.value })
-  const userMsg = input.value.toLowerCase()
-  let found = false
-  for (const item of faq) {
-    if (item.keywords.every((k) => userMsg.includes(k))) {
-      messages.value.push({ from: 'bot', text: item.answer })
-      found = true
-      break
-    }
-  }
-  if (!found) {
-    // Llama a la API externa si no hay respuesta local
-    const apiReply = await fetchApiResponse(input.value)
-    messages.value.push({ from: 'bot', text: apiReply })
-  }
+  const response = await fetchGeminiResponse(input.value)
+  messages.value.push({ from: 'bot', text: response })
   input.value = ''
 }
 </script>
