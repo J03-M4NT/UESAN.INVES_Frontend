@@ -26,7 +26,7 @@
             <div><b>Descripción:</b> {{ propuestaSeleccionada.descripcion }}</div>
             <div><b>Categoría:</b> {{ propuestaSeleccionada.categoriaNombre }}</div>
             <div><b>Incentivo:</b> {{ propuestaSeleccionada.incentivo }}</div>
-            <div><b>Correo:</b> {{ propuestaSeleccionada.correo }}</div>
+            <div><b>Correo:</b> {{ propuestaSeleccionada.correoUsuario }}</div>
             <div class="q-mt-md"><b>Profesor:</b> {{ propuestaSeleccionada.profesorNombre }}</div>
           </div>
         </q-card-section>
@@ -46,6 +46,8 @@ const propuestas = ref([])
 const loading = ref(false)
 const dialogoDetalles = ref(false)
 const propuestaSeleccionada = ref({})
+const categorias = ref([])
+const usuariosCache = ref({})
 
 const columns = [
   { name: 'tema', label: 'Tema', field: 'tema', align: 'left' },
@@ -53,12 +55,56 @@ const columns = [
   { name: 'detalles', label: 'Detalles', field: 'detalles', align: 'center' },
 ]
 
+const getCategoriaNombre = (categoriaId) => {
+  const cat = categorias.value.find((c) => c.categoriaId === categoriaId)
+  return cat ? cat.nombreCategoria : 'N/A'
+}
+
+const getUsuarioInfo = async (usuarioId) => {
+  if (!usuarioId) return { nombreCompleto: 'N/A', correo: 'N/A' }
+  if (usuariosCache.value[usuarioId]) return usuariosCache.value[usuarioId]
+  try {
+    const res = await api.get(`/api/Usuarios/${usuarioId}`)
+    const nombreCompleto = res.data?.nombre + ' ' + (res.data?.apellido || '')
+    const correo = res.data?.correo || 'N/A'
+    const info = { nombreCompleto, correo }
+    usuariosCache.value[usuarioId] = info
+    return info
+  } catch {
+    return { nombreCompleto: 'N/A', correo: 'N/A' }
+  }
+}
+
 const fetchPropuestas = async () => {
   loading.value = true
   try {
-    // Reemplaza con tu endpoint real
+    // Cargar categorías
+    const catRes = await api.get('/api/Categorias')
+    categorias.value = catRes.data
+    // Cargar propuestas
     const res = await api.get('/api/Propuestas')
-    propuestas.value = res.data['$values'] || res.data || []
+    let propuestasRaw = res.data['$values'] || res.data || []
+    // Enriquecer propuestas con nombre de categoría y nombre de profesor
+    propuestas.value = await Promise.all(
+      propuestasRaw.map(async (p) => {
+        // Nombre de categoría
+        const categoriaNombre = getCategoriaNombre(p.categoriaId)
+        // Nombre de profesor y correo
+        let profesorNombre = 'N/A'
+        let correoUsuario = 'N/A'
+        if (p.usuarioId) {
+          const info = await getUsuarioInfo(p.usuarioId)
+          profesorNombre = info.nombreCompleto
+          correoUsuario = info.correo
+        }
+        return {
+          ...p,
+          categoriaNombre,
+          profesorNombre,
+          correoUsuario,
+        }
+      }),
+    )
   } catch (err) {
     console.error('Error cargando propuestas:', err)
   } finally {
@@ -66,8 +112,22 @@ const fetchPropuestas = async () => {
   }
 }
 
-const verDetalles = (propuesta) => {
-  propuestaSeleccionada.value = { ...propuesta }
+const verDetalles = async (propuesta) => {
+  // Enriquecer detalles con nombre de categoría, profesor y correo
+  const categoriaNombre = getCategoriaNombre(propuesta.categoriaId)
+  let profesorNombre = 'N/A'
+  let correoUsuario = 'N/A'
+  if (propuesta.usuarioId) {
+    const info = await getUsuarioInfo(propuesta.usuarioId)
+    profesorNombre = info.nombreCompleto
+    correoUsuario = info.correo
+  }
+  propuestaSeleccionada.value = {
+    ...propuesta,
+    categoriaNombre,
+    profesorNombre,
+    correoUsuario,
+  }
   dialogoDetalles.value = true
 }
 
