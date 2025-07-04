@@ -70,6 +70,12 @@ const columns = [
   { name: 'correo', label: 'Correo', field: 'correo', align: 'left' },
   { name: 'contrasena', label: 'Contraseña', field: 'contrasena', align: 'left' },
   {
+    name: 'rol',
+    label: 'Rol',
+    field: (row) => getRoleName(row.rolId),
+    align: 'left',
+  },
+  {
     name: 'estado',
     label: 'Estado',
     field: (row) => (row.estado === true || row.estado === 'Activo' ? 'Activo' : 'No Activo'),
@@ -129,6 +135,21 @@ const registrarProfesor = async () => {
     Object.assign(nuevo.value, { nombre: '', apellido: '', correo: '', contrasena: '' })
   } catch {
     Notify.create({ type: 'negative', message: 'Error registrando profesor' })
+  }
+}
+
+function getRoleName(rolId) {
+  switch (Number(rolId)) {
+    case 1:
+      return 'Estudiante'
+    case 2:
+      return 'Profesor'
+    case 3:
+      return 'Personal externo'
+    case 4:
+      return 'Administrador'
+    default:
+      return ''
   }
 }
 

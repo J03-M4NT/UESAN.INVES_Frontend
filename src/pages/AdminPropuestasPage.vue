@@ -1,6 +1,14 @@
 <template>
   <q-page padding>
-    <h1 class="text-h5 q-mb-md">Propuestas de Revistas</h1>
+    <div class="row items-center q-mb-md">
+      <div class="col">
+        <h1 class="text-h5">Propuestas de Revistas</h1>
+      </div>
+      <div class="col-auto">
+        <q-btn color="primary" icon="download" label="Exportar Excel" @click="exportarExcel" />
+      </div>
+    </div>
+
     <q-table
       :rows="propuestas"
       :columns="columns"
@@ -41,6 +49,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from 'boot/axios'
+import * as XLSX from 'xlsx'
 
 const propuestas = ref([])
 const loading = ref(false)
@@ -129,6 +138,23 @@ const verDetalles = async (propuesta) => {
     correoUsuario,
   }
   dialogoDetalles.value = true
+}
+
+// Función para exportar propuestas a Excel
+const exportarExcel = () => {
+  // Prepara los datos para el Excel
+  const data = propuestas.value.map((p) => ({
+    Tema: p.tema,
+    Descripción: p.descripcion,
+    Categoría: p.categoriaNombre,
+    Incentivo: p.incentivo,
+    Correo: p.correoUsuario,
+    Profesor: p.profesorNombre,
+  }))
+  const ws = XLSX.utils.json_to_sheet(data)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Propuestas')
+  XLSX.writeFile(wb, 'propuestas.xlsx')
 }
 
 onMounted(fetchPropuestas)

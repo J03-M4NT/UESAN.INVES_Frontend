@@ -47,8 +47,8 @@
 
     <!-- Call to Action -->
     <div class="q-mt-xl text-center">
-      <h3 class="text-h6">¿Quieres saber más de las revistas publicadas?</h3>
-      <q-btn color="primary" label="Ingresa aquí" />
+      <h3 class="text-h6">¿Quieres saber más de las publicaciones?</h3>
+      <q-btn color="primary" label="Ingresa aquí" @click="goToRevistas" />
     </div>
   </q-page>
 </template>
@@ -56,7 +56,9 @@
 <script setup>
 import { ref } from 'vue'
 import { scroll } from 'quasar'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const { setVerticalScrollPosition } = scroll
 
 const servicios = ref([
@@ -94,6 +96,10 @@ const servicios = ref([
 function scrollTo(id) {
   const el = document.getElementById(id)
   if (el) setVerticalScrollPosition(window, el.offsetTop, 500)
+}
+
+function goToRevistas() {
+  router.push('/revistas')
 }
 </script>
 
