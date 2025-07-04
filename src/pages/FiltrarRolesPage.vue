@@ -9,15 +9,15 @@
           <q-select
             v-model="selectedRol"
             :options="roles"
-            option-label="nombre"
-            option-value="id"
+            option-label="NombreRol"
+            option-value="RolID"
             label="Selecciona un rol"
-            @change="onRolChange"
+            @update:model-value="onRolChange"
           />
         </div>
 
         <!-- Tabla de usuarios -->
-        <q-table :rows="usuarios" :columns="columns" row-key="id" flat bordered />
+        <q-table :rows="usuarios" :columns="columns" row-key="UsuarioID" flat bordered />
       </q-card-section>
     </q-card>
   </q-page>
@@ -30,42 +30,49 @@ import { obtenerUsuariosPorRol, obtenerRoles } from '../services/UsuariosService
 const usuarios = ref([])
 const roles = ref([])
 const selectedRol = ref('')
+
 const columns = [
   { name: 'nombre', label: 'Nombre', field: 'nombre', align: 'left' },
-  { name: 'rol', label: 'Rol', field: (row) => getRoleName(row.rolId), align: 'left' },
+  { name: 'apellido', label: 'Apellido', field: 'apellido', align: 'left' },
+  { name: 'correo', label: 'Correo', field: 'correo', align: 'left' },
+  { name: 'rol', label: 'Rol', field: 'rol', align: 'left' },
 ]
 
-function getRoleName(rolId) {
-  switch (Number(rolId)) {
-    case 1:
-      return 'Estudiante'
-    case 2:
-      return 'Profesor'
-    case 3:
-      return 'Personal externo'
-    case 4:
-      return 'Administrador'
-    default:
-      return 'Desconocido'
+function getRoleName(rolID) {
+  const mapa = {
+    1: 'Estudiante',
+    2: 'Profesor',
+    3: 'Personal externo',
+    4: 'Administrador',
   }
+  return mapa[rolID] || 'Desconocido'
 }
 
 async function cargarUsuarios() {
-  usuarios.value = await obtenerUsuariosPorRol(selectedRol.value)
-  // Si los usuarios vienen con 'rolId', mapea el nombre del rol
-  usuarios.value = usuarios.value.map((u) => ({ ...u, rol: getRoleName(u.rolId) }))
+  const data = await obtenerUsuariosPorRol(selectedRol.value)
+  usuarios.value = data.map((u) => ({
+    ...u,
+    rol: getRoleName(u.RolID),
+  }))
 }
 
 async function cargarRoles() {
-  roles.value = await obtenerRoles()
+  const rolesBackend = await obtenerRoles()
+  roles.value = [
+    { RolID: '', NombreRol: 'Todos los roles' },
+    ...rolesBackend.map((r) => ({
+      RolID: r.RolID,
+      NombreRol: r.NombreRol,
+    })),
+  ]
+}
+
+function onRolChange() {
+  cargarUsuarios()
 }
 
 onMounted(() => {
   cargarRoles()
   cargarUsuarios()
 })
-
-function onRolChange() {
-  cargarUsuarios()
-}
 </script>

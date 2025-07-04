@@ -3,7 +3,7 @@
     <div class="chatbot-fab" v-if="!open" @click="open = true">💬</div>
     <div class="chatbot-container" v-else>
       <div class="chatbot-header">
-        ChatBot
+        Asistente Virtual
         <span style="float: right; cursor: pointer" @click="open = false">✖</span>
       </div>
       <div class="chatbot-messages">
