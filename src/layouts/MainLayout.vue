@@ -105,11 +105,25 @@
           <!-- Solo mostrar Enviar Propuestas a profesores, ocultar para otros roles -->
           <q-item
             v-if="Number(user.rolId) === 2"
-            :clickable="user.estado === 'Activo'"
-            :to="user.estado === 'Activo' ? '/mis-articulos' : undefined"
+            :clickable="
+              user.estado === true || String(user.estado).trim().toLowerCase() === 'activo'
+            "
+            :to="
+              user.estado === true || String(user.estado).trim().toLowerCase() === 'activo'
+                ? '/mis-articulos'
+                : undefined
+            "
             class="drawer-link"
-            :class="{ 'text-grey-5': user.estado !== 'Activo' }"
-            :style="user.estado !== 'Activo' ? { pointerEvents: 'none', opacity: 0.6 } : {}"
+            :class="{
+              'text-grey-5': !(
+                user.estado === true || String(user.estado).trim().toLowerCase() === 'activo'
+              ),
+            }"
+            :style="
+              !(user.estado === true || String(user.estado).trim().toLowerCase() === 'activo')
+                ? { pointerEvents: 'none', opacity: 0.6 }
+                : {}
+            "
           >
             <q-item-section avatar>
               <q-icon name="article" />
@@ -142,7 +156,13 @@ window.addEventListener('storage', () => {
 })
 
 watchEffect(() => {
+  // Mostrar el objeto user y el estado exacto
   console.log('Usuario actual:', user.value)
+  if (user.value) {
+    console.log('Estado (raw):', user.value.estado)
+    console.log('Estado (normalizado):', String(user.value.estado).trim().toLowerCase())
+    console.log('RolId:', user.value.rolId)
+  }
 })
 
 const linksList = computed(() => [
