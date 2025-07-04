@@ -82,7 +82,7 @@
         <q-separator spaced />
         <!-- Opciones según el rol -->
         <template v-if="user && Number(user.rolId) === 4">
-          <q-item clickable to="/admin/perfil" class="drawer-link">
+          <q-item clickable @click="showPerfilModal = true" class="drawer-link">
             <q-item-section avatar>
               <q-icon name="manage_accounts" />
             </q-item-section>
@@ -96,7 +96,7 @@
           </q-item>
         </template>
         <template v-else-if="user && [1, 2, 3].includes(Number(user.rolId))">
-          <q-item clickable @click="goToPerfil" class="drawer-link">
+          <q-item clickable @click="showPerfilModal = true" class="drawer-link">
             <q-item-section avatar>
               <q-icon name="person" />
             </q-item-section>
@@ -134,6 +134,7 @@
       </q-list>
     </q-drawer>
 
+    <PerfilModal :show="showPerfilModal" @close="showPerfilModal = false" />
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -144,12 +145,14 @@
 
 <script setup>
 import { computed, ref, watchEffect } from 'vue'
+import PerfilModal from 'components/auth/PerfilModal.vue'
 import { useRouter } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
 import ChatBot from 'src/components/auth/ChatBot.vue'
 
 const router = useRouter()
 const user = ref(JSON.parse(localStorage.getItem('user')) || {})
+const showPerfilModal = ref(false)
 
 window.addEventListener('storage', () => {
   user.value = JSON.parse(localStorage.getItem('user')) || {}
@@ -203,11 +206,6 @@ function getRoleName(rolId) {
     default:
       return ''
   }
-}
-
-function goToPerfil() {
-  router.push('/perfil')
-  rightDrawerOpen.value = false
 }
 
 const propuestasCount = ref(0)
