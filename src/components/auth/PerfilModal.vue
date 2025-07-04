@@ -3,7 +3,7 @@
     <div class="modal-content formal-modal">
       <button class="close-btn" @click="close" aria-label="Cerrar">×</button>
       <div class="modal-header">
-        <img src="/public/favicon.ico" alt="Logo" class="modal-logo" />
+        <img src="/public/usuario.png" alt="Logo" class="modal-logo" />
         <div class="modal-title">Mi Perfil</div>
       </div>
       <div class="modal-body">
