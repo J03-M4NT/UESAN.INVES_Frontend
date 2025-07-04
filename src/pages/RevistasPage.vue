@@ -30,6 +30,15 @@
       clearable
     />
 
+    <!-- Buscador de revistas por ISSN -->
+    <q-input
+      filled
+      v-model="busquedaISSN"
+      label="Buscar revista por ISSN"
+      class="q-mb-xl"
+      clearable
+    />
+
     <div class="row q-col-gutter-md">
       <div
         class="col-12 col-md-6 col-lg-4"
@@ -97,13 +106,18 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { api } from 'boot/axios'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
 
 const lineaSeleccionada = ref(null)
 const busquedaRevista = ref('')
+const busquedaISSN = ref('')
 const revistas = ref([])
 const lineas = ref([])
 const dialogoDetalle = ref(false)
 const revistaDetalle = ref({})
+const guardadosIds = ref([])
 
 onMounted(async () => {
   try {
@@ -132,6 +146,21 @@ onMounted(async () => {
       abdc: r.abdc,
       woSLatam: r.woSLatam,
     }))
+
+    // Cargar guardados del usuario
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (user && user.usuarioId) {
+      try {
+        const res = await api.get(`/api/ListasCerradasGuardadas?usuarioId=${user.usuarioId}`)
+        guardadosIds.value = (res.data['$values'] || res.data || []).map((g) => g.listasCerradasId)
+      } catch (err) {
+        if (err.response && err.response.status === 404) {
+          guardadosIds.value = []
+        } else {
+          console.error('Error cargando guardados:', err)
+        }
+      }
+    }
   } catch (err) {
     console.error('Error cargando datos:', err)
   }
@@ -146,6 +175,15 @@ const revistasFiltradas = computed(() => {
     const texto = busquedaRevista.value.toLowerCase()
     resultado = resultado.filter((r) => r.nombre && r.nombre.toLowerCase().includes(texto))
   }
+  if (busquedaISSN.value) {
+    const texto = busquedaISSN.value.toLowerCase()
+    resultado = resultado.filter(
+      (r) =>
+        (r.issn && r.issn.toLowerCase().includes(texto)) ||
+        (r.issn2 && r.issn2.toLowerCase().includes(texto)) ||
+        (r.issn3 && r.issn3.toLowerCase().includes(texto)),
+    )
+  }
   return resultado
 })
 
@@ -154,20 +192,34 @@ const getCategoriaNombre = (categoriaId) => {
   return cat ? cat.nombreCategoria : 'N/A'
 }
 
-const guardarRevista = (id) => {
-  let guardadas = JSON.parse(localStorage.getItem('revistasGuardadas')) || []
-  if (!guardadas.includes(id)) {
-    guardadas.push(id)
-  } else {
-    guardadas = guardadas.filter((item) => item !== id)
+const guardarRevista = async (listasCerradasId) => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (!user || !user.usuarioId) {
+      $q.notify({ type: 'negative', message: 'Debes iniciar sesión para guardar.' })
+      return
+    }
+    if (!guardadosIds.value.includes(listasCerradasId)) {
+      await api.post('/api/ListasCerradasGuardadas', {
+        usuarioId: user.usuarioId,
+        listasCerradasId,
+        fechaGuardado: new Date().toISOString(),
+      })
+      guardadosIds.value.push(listasCerradasId)
+      $q.notify({ type: 'positive', message: 'Guardado con éxito' })
+    } else {
+      // Eliminar guardado
+      await api.delete(`/api/ListasCerradasGuardadas/${user.usuarioId}/${listasCerradasId}`)
+      guardadosIds.value = guardadosIds.value.filter((id) => id !== listasCerradasId)
+      $q.notify({ type: 'info', message: 'Guardado eliminado' })
+    }
+  } catch (err) {
+    $q.notify({ type: 'negative', message: 'Error al guardar/quitar' })
+    console.error(err)
   }
-  localStorage.setItem('revistasGuardadas', JSON.stringify(guardadas))
 }
 
-const estaGuardada = (id) => {
-  const guardadas = JSON.parse(localStorage.getItem('revistasGuardadas')) || []
-  return guardadas.includes(id)
-}
+const estaGuardada = (id) => guardadosIds.value.includes(id)
 
 const verDetalle = (revista) => {
   revistaDetalle.value = { ...revista }

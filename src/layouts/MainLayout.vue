@@ -23,7 +23,7 @@
           v-bind="link"
           class="drawer-link"
         />
-        <!-- Solo mostrar el panel de control si el usuario es admin -->
+        <!-- Solo mostrar el panel de control y propuestas si el usuario es admin -->
         <q-item
           v-if="user && Number(user.rolId) === 4"
           clickable
@@ -33,6 +33,20 @@
           <q-item-section>
             <q-icon name="settings" />
             <span class="q-ml-sm">Panel de Control</span>
+          </q-item-section>
+        </q-item>
+        <q-item
+          v-if="user && Number(user.rolId) === 4"
+          clickable
+          to="/admin/propuestas"
+          class="drawer-link"
+        >
+          <q-item-section>
+            <q-icon name="assignment" />
+            <span class="q-ml-sm">Propuestas</span>
+            <q-badge color="primary" align="top right" v-if="propuestasCount > 0">{{
+              propuestasCount
+            }}</q-badge>
           </q-item-section>
         </q-item>
         <!-- Espaciador para empujar el botón hacia abajo -->
@@ -88,22 +102,19 @@
             </q-item-section>
             <q-item-section>Mi Perfil</q-item-section>
           </q-item>
-          <q-item clickable to="/mis-articulos" class="drawer-link">
+          <!-- Solo mostrar Enviar Propuestas a profesores, ocultar para otros roles -->
+          <q-item
+            v-if="Number(user.rolId) === 2"
+            :clickable="user.estado === 'Activo'"
+            :to="user.estado === 'Activo' ? '/mis-articulos' : undefined"
+            class="drawer-link"
+            :class="{ 'text-grey-5': user.estado !== 'Activo' }"
+            :style="user.estado !== 'Activo' ? { pointerEvents: 'none', opacity: 0.6 } : {}"
+          >
             <q-item-section avatar>
               <q-icon name="article" />
             </q-item-section>
-            <q-item-section>Mis Artículos</q-item-section>
-          </q-item>
-          <q-item
-            v-if="[1, 2].includes(Number(user.rolId))"
-            clickable
-            to="/mis-cursos"
-            class="drawer-link"
-          >
-            <q-item-section avatar>
-              <q-icon name="school" />
-            </q-item-section>
-            <q-item-section>Mis Cursos</q-item-section>
+            <q-item-section>Enviar Propuestas</q-item-section>
           </q-item>
         </template>
       </q-list>
@@ -177,6 +188,19 @@ function getRoleName(rolId) {
 function goToPerfil() {
   router.push('/perfil')
   rightDrawerOpen.value = false
+}
+
+const propuestasCount = ref(0)
+
+// Simulación: fetch de propuestas para el admin (reemplazar por API real)
+function fetchPropuestasCount() {
+  // Aquí deberías hacer una petición real al backend para obtener el número de propuestas
+  // Por ahora, simula con un número fijo
+  propuestasCount.value = 3 // <-- Cambia esto por la respuesta real
+}
+
+if (user.value && Number(user.value.rolId) === 4) {
+  fetchPropuestasCount()
 }
 </script>
 
