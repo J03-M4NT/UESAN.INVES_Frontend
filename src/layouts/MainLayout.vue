@@ -49,6 +49,17 @@
             }}</q-badge>
           </q-item-section>
         </q-item>
+        <q-item
+          v-if="user && Number(user.rolId) === 4"
+          clickable
+          to="/filtrar-roles"
+          class="drawer-link"
+        >
+          <q-item-section>
+            <q-icon name="manage_accounts" />
+            <span class="q-ml-sm">Filtrar por roles</span>
+          </q-item-section>
+        </q-item>
         <!-- Espaciador para empujar el botón hacia abajo -->
         <q-space />
         <!-- Botón de cerrar sesión al pie -->
